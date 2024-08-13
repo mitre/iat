@@ -1,0 +1,122 @@
+#
+# NOTICE
+# 
+# This software (or technical data) was produced for the U. S. Government 
+# and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+# (May 2014) – Alternative IV (Dec 2007)
+# 
+# (c) 2024 The MITRE Corporation. All Rights Reserved.
+# 
+
+#IMPORTANT!
+#To deploy this compose file, set the following environment variables in a .env file. 
+#DATABASE_PASSWORD, DATABASE_USERNAME, DATABASE_ROOT_PASSWORD
+#See the below docs link for details about .env files
+#https://docs.docker.com/compose/environment-variables/set-environment-variables/#compose-file
+
+services:
+  activemq:
+    image: rmohr/activemq:5.15.9-alpine
+    container_name: activemq
+    restart: always
+    ports:
+      - 8161:8161
+      - 61616:61616
+      - 61613:61613
+      # environment:
+      # - ACTIVEMQ_LOGGER_LOGLEVEL=DEBUG
+
+#This is commented out here so that you can run the iwp service locally (via the jar / yarn dev server) for testing and development. 
+#  iwp:
+#    image: ghcr.io/mitre/iat/iwp-web:latest
+#    # restart: always
+#    depends_on:
+#      - "activemq"
+#      - "mysql"
+#    container_name: iwp
+#    ports:
+#      - 8080:8080
+#    volumes:
+#      - "./iwp/config:/app/config"
+#    environment:
+#      - DATABASE_HOST=iwp_mysql
+#      # - DATABASE_HOST=localhost
+#      # - DATABASE_HOST=iwp-simple_mysql_1
+#      - DATABASE_USER=${DATABASE_USERNAME}
+#      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+#      - DATABASE_NAME=iwp
+#      - DATABASE_PORT=3306
+#    restart: always
+#    env_file: .env
+
+  iwp-acii:
+    image: ghcr.io/mitre/iat/iwp-acii:latest
+    container_name: acii
+    restart: always
+    depends_on:
+      - "activemq"
+
+  iwp-biqt:
+    image: ghcr.io/mitre/iat/iwp-biqt:latest
+    container_name: biqt
+    restart: always
+    depends_on:
+      - "activemq"
+    volumes:
+      - "./iwp-biqt/config:/app/config"
+      - "./iwp-biqt/contact_model:/usr/local/share/biqt/providers/BIQTContactDetector/config/models/"
+     
+  iwp-annotation:
+    image: ghcr.io/mitre/iat/iwp-annotation:latest
+    container_name: annotation
+    restart: always
+    depends_on:
+      - "activemq"
+    environment:
+      - STOMP_HOST=activemq:61613
+      - IRIS-ANNOTATION_PROTO_RECEIVE_QUEUE=iris.annotation.request
+      - IRIS-ANNOTATION_PROTO_REPLY_QUEUE=iris.annotation.response
+
+  iwp-tshepii:
+    image: ghcr.io/mitre/iat/iwp-tshepii:latest
+    container_name: tshepii
+    restart: always
+    depends_on:
+      - "activemq"
+    volumes:
+      - "./iwp-tshepii/config:/etc/tshepii-config"
+    environment:
+      - LOG4CXX_CONFIGURATION=/etc/tshepii-config/log4cxx.conf
+      - TSHEPII_CONFIG_FILE=/etc/tshepii-config/tshepii.conf
+      - CONTACTCLASSIFIER_PROTO_RECEIVE_QUEUE=iris.contactdetection.request
+      - CONTACTCLASSIFIER_PROTO_REPLY_QUEUE=iris.contactdetection.response
+
+  mysql:
+    image: mysql:8
+    container_name: iwp_mysql
+    restart: always
+    environment:
+      # MYSQL_DATABASE: 'iwp'
+      MYSQL_DATABASE: iwp
+      # So you don't have to use root, but you can if you like
+      MYSQL_USER: ${DATABASE_USERNAME}
+      # You can use whatever password you like
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      # <Port exposed> : < MySQL Port running inside container>
+      - '3306:3306'
+    expose:
+      # Opens port 3306 on the container
+      - '3306'
+      # Where our data will be persisted
+    volumes:
+      - my-db:/var/lib/mysql
+    security_opt:
+      - seccomp:unconfined
+    env_file: .env
+
+volumes:
+  my-db:
