@@ -64,7 +64,6 @@ services:
       - "activemq"
     volumes:
       - "./iwp-biqt/config:/app/config"
-      - "./iwp-biqt/contact_model:/usr/local/share/biqt/providers/BIQTContactDetector/config/models/"
      
   iwp-annotation:
     image: ghcr.io/mitre/iat/iwp-annotation:latest
