@@ -87,8 +87,6 @@ services:
     environment:
       - LOG4CXX_CONFIGURATION=/etc/tshepii-config/log4cxx.conf
       - TSHEPII_CONFIG_FILE=/etc/tshepii-config/tshepii.conf
-      - CONTACTCLASSIFIER_PROTO_RECEIVE_QUEUE=iris.contactdetection.request
-      - CONTACTCLASSIFIER_PROTO_REPLY_QUEUE=iris.contactdetection.response
 
   mysql:
     image: mysql:8
