@@ -1,3 +1,7 @@
+# NOTICE #
+
+Only artifacts necessary for running the containerized version of the Iris Analysis Tookit stack is currently available. Code will be published soon. Please see [Quickstart for Users](#quickstart-for-users) below for running the software with `Docker`.
+
 # Iris Analysis Toolkit #
 
 The Iris Analysis Toolkit (IAT), formerly known as the Iris Workstation and Iris Workstation Prototype, is a system that demonstrates the capabilities of an iris examination workstation. It was made to allow users to easily create generic Electronic Biometric Transmission Specification files as well as review and annotate iris images.
