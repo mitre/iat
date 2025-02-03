@@ -1,6 +1,6 @@
 # NOTICE #
 
-Only artifacts necessary for running the containerized version of the Iris Analysis Tookit stack is currently available. Code will be published soon. Please see [Quickstart for Users](#quickstart-for-users) below for running the software with `Docker`.
+Only artifacts necessary for running the containerized version of the Iris Analysis Tookit stack are currently available. Code will be published soon. Please see [Quickstart for Users](#quickstart-for-users) below for running the software with `Docker`.
 
 # Iris Analysis Toolkit #
 
