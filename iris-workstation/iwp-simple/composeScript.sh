@@ -13,13 +13,7 @@
 
 killAllDocker() {
   echo "Killing all IWP Docker Containers..."
-  docker kill iwp
-  docker kill activemq
-  docker kill acii
-  docker kill biqt
-  docker kill contact
-  docker kill tshepii
-  docker kill iwp_mysql
+  docker compose down
 }
 
 pruneSystem() {
@@ -34,7 +28,8 @@ pruneVolumes() {
 
 dockerUp(){
   echo "Starting Docker Containers..."
-  docker-compose up
+  docker compose pull
+  docker compose up
 }
 
 case $1 in

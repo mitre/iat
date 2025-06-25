@@ -23,9 +23,9 @@ services:
       - 8161:8161
       - 61616:61616
       - 61613:61613
-      # environment:
-      # - ACTIVEMQ_LOGGER_LOGLEVEL=DEBUG
-  
+  # environment:
+  # - ACTIVEMQ_LOGGER_LOGLEVEL=DEBUG
+
   iwp:
     image: ghcr.io/mitre/iat/iwp-web:latest
     restart: always
@@ -64,7 +64,8 @@ services:
       - "activemq"
     volumes:
       - "./iwp-biqt/config:/app/config"
-
+    platform: linux/amd64
+  
   iwp-annotation:
     image: ghcr.io/mitre/iat/iwp-annotation:latest
     container_name: annotation
@@ -87,6 +88,13 @@ services:
     environment:
       - LOG4CXX_CONFIGURATION=/etc/tshepii-config/log4cxx.conf
       - TSHEPII_CONFIG_FILE=/etc/tshepii-config/tshepii.conf
+
+  iwp-pdm:
+    image: ghcr.io/mitre/iat/iwp-pdm:latest
+    container_name: pdm
+    restart: always
+    depends_on:
+      - "activemq"
 
   mysql:
     image: mysql:8
@@ -113,7 +121,7 @@ services:
     expose:
       # Opens port 3306 on the container
       - '3306'
-      # Where our data will be persisted
+    # Where our data will be persisted
     volumes:
       - my-db:/var/lib/mysql
     security_opt:
