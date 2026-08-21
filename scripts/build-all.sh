@@ -61,7 +61,9 @@ clone_if_missing https://github.com/mitre/biqt.git "$DEPENDENCY_ROOT/biqt"
 
 (
   cd "$DEPENDENCY_ROOT/biqt/java"
-  mvn install
+  # BIQT's Java tests require the separately built libbiqtapi native library.
+  # IAT needs the Java artifact, so install it without running those upstream tests.
+  mvn install -DskipTests
 )
 
 (

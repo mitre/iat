@@ -30,10 +30,10 @@ To build this Docker image, complete the following prerequisites.
     ```sh
     git clone https://github.com/mitre/biqt.git ../biqt-core
     cd ../biqt-core/java
-    mvn install
+    mvn install -DskipTests
     cd ../../iat
     ```
-    This installs `org.mitre:biqt:26.05`, which the IAT BIQT component requires.
+    This installs `org.mitre:biqt:26.05`, which the IAT BIQT component requires. The BIQT Java tests require a separately built native `libbiqtapi` library, so this command skips those upstream tests.
 4. Build the IAT BIQT JAR by running the following command in the main `iat/` project directory:
     ```sh
     mvn -pl biqt -am package
