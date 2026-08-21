@@ -1,0 +1,200 @@
+<!-- 
+    NOTICE
+ 
+    This software (or technical data) was produced for the U. S. Government 
+    and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+    (May 2014) – Alternative IV (Dec 2007)
+
+    (c) 2024 The MITRE Corporation. All Rights Reserved.
+-->
+<mat-toolbar class="canvas-toolbar">
+  <div class="mr-1" *ngIf="isReview" [matTooltip]="annotationStatus ? 'Pull Automated Annotations':'Fetching Automated Annotations'">
+    <button mat-mini-fab color="primary" #irisAnnotationButton
+            (click)="pullAnnotations()"
+            [disabled]="!annotationStatus || isToolBarActive || toolManager.pullAnnoButtonClicked">
+      <mat-icon>auto_awesome_mosaic</mat-icon>
+    </button>
+  </div>
+  <div class="mr-1" [matTooltip]="pdmStatus ? 'Pupil Dilation Mode':'Fetching Pupil Dilation Images'">
+    <button mat-mini-fab color="primary" #pdmButton
+            (click)="triggerPdmMode()"
+            [disabled]="!pdmStatus || isToolBarActive || inPdmMode">
+      <mat-icon>all_out</mat-icon>
+    </button>
+  </div>
+  <div *ngIf="isReview && hasUnrolled" value="original" name="showcanvas" multiple="true"
+                           aria-label="Select Canvases to Display">
+    <mat-slide-toggle color="primary" class="ml-2" labelPosition="before" value="original" [checked]="showOriginal.getValue()" (change)="onShowOriginalClicked($event)"><span class="unrolled-label">Original</span></mat-slide-toggle>
+    <mat-slide-toggle color="primary" class="ml-3" labelPosition="before" value="unrolled" [checked]="showUnrolled.getValue()" (change)="showUnrolled.next($event.source.checked)"><span class="unrolled-label">Unrolled</span></mat-slide-toggle>
+  </div>
+  <span class="fill-space"></span>
+  <button mat-raised-button color="primary" class="toolbar-btn mr-sm" matTooltip="Resubmit image for analysis"
+          (click)="resubmitButtonClicked(resubmitModal)" [disabled]="isToolBarActive">
+    Resubmit
+  </button>
+  <button mat-raised-button color="primary" class="icon-btn toolbar-btn mr-1" #historyButton
+          (click)="toggleAnnotations($event)" [disabled]="isToolBarActive" matTooltip="Show/Hide Annotations & History">
+    <i aria-hidden="true" *ngIf="showHistory; else hideHistory" class="fa fa-eye-slash"></i>
+    <ng-template #hideHistory>
+      <i aria-hidden="true" class="fa fa-eye"></i>
+    </ng-template>
+  </button>
+  <button mat-raised-button color="primary" class="toolbar-btn mr-sm" matTooltip="Reset Annotations to previous save point"
+          (click)="reset_clear(true, false)" [disabled]="isToolBarActive">
+    Reset
+  </button>
+  <button mat-raised-button color="primary" class="toolbar-btn mr-2" matTooltip="Clear all Annotations"
+          (click)="reset_clear(false, true)"
+          [disabled]="isToolBarActive">
+    Clear
+  </button>
+  <button mat-mini-fab color="primary" class="mr-sm" matTooltip="Undo last annotation"
+          (click)="undo()"
+          [disabled]="toolManager.states.past.length == 0 || isToolBarActive">
+    <mat-icon>undo</mat-icon>
+  </button>
+  <button mat-mini-fab color="primary" matTooltip="Redo last annotation" (click)="redo()"
+          [disabled]="toolManager.states.future.length == 0 || isToolBarActive">
+    <mat-icon>redo</mat-icon>
+  </button>
+</mat-toolbar>
+<div class="tool-pallet">
+  <ng-container #irisToolDisplay *ngIf="(!inPdmMode && !reviewService._showDualPDMComparison)">
+    <app-iris-tool *ngIf="activeTool" [tool]="activeTool" [instanceId]="id"></app-iris-tool>
+  </ng-container>
+  <ng-container #individualPdmTool *ngIf="(inPdmMode && !reviewService._showDualPDMComparison)">
+    <app-pupil-dilation-tool></app-pupil-dilation-tool>
+  </ng-container>
+  <ng-container #dualPdmTool *ngIf="(!inPdmMode && reviewService._showDualPDMComparison)">
+    <app-dual-pdm></app-dual-pdm>
+  </ng-container>
+</div>
+
+<div id="canvas-wrapper">
+  <mat-drawer-container autosize="false">
+    <mat-drawer #drawer mode="side" opened="false" position="end">
+      <mat-tab-group id="tab-group" dynamicHeight="false">
+        <mat-tab label="Annotations">
+          <app-annotation #annotationComp (remove)="toolManager.removeItem($event)"
+                          (annotationMouseOn)="toolManager.annotationMouseOn($event)"
+                          (annotationMouseOff)="toolManager.annotationMouseOff($event)" [annotations]="annotations"
+                          [itemsMap]="toolManager.itemsMap" [hiddenAnnotations]="toolManager.hidden"
+                          (showHideAnnotations)="toolManager.showHideAnnotations($event)"
+                          (deleteAnnotations)="toolManager.deleteAllAnnotations(true)"
+                          (groupAnnotations)="toolManager.groupItems($event, true)"
+                          (showHideAnnotation)="toolManager.showHideAnnotation($event)"
+                          [color]="toolManager.annotationColor"
+                          (showAnnotationColor)="showAnnotationColor($event)"
+                          [annotationTextSize]="toolManager.annotationTextSize"
+                          (updateAnnotationTextSize)="toolManager.updateAnnotationTextSize($event)"
+                          (selectedAnnotationChanged)="toolManager.selectedAnnotationChanged($event)"></app-annotation>
+        </mat-tab>
+        <mat-tab label="History">
+          <app-annotation-history #historyComp [history]="toolManager.states" [itemsMap]="toolManager.itemsMap"
+                                  (revert)="toolManager.revertToState($event)"></app-annotation-history>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-drawer>
+    <div class="toolbar" [ngClass]="{'vertical': isVertical | async}">
+      <!-- Don't show Toolbar until canvas has been initialized -->
+      <ng-container *ngIf="hasCanvas">
+        <div class="toolbar-inner-left image-toolbar" [ngClass]="{'vertical': isVertical | async}">
+          <ng-container *ngFor="let t of imageTools">
+            <button class="btn btn-sm btn-secondary tool-btn" type="button" (click)="activateTool(t.name)"
+                    [ngClass]="{'active': activeTool == t.name}" [matTooltip]="t.name" placement="right"
+                    [disabled]="isToolBarActive">
+              <i class="fa fa-fw" [ngClass]="iconMap[t.name]" aria-hidden="true"></i>
+            </button>
+          </ng-container>
+        </div>
+        <div class="toolbar-inner-right annotation-toolbar" [ngClass]="{'vertical': isVertical | async}">
+          <ng-container *ngFor="let t of annotationTools">
+            <button class="btn btn-sm btn-secondary tool-btn" type="button" (click)="activateTool(t.name)"
+                    [ngClass]="{'active': activeTool == t.name}" [matTooltip]="t.name" placement="right"
+                    [disabled]="isToolBarActive">
+              <i class="fa fa-fw" [ngClass]="iconMap[t.name]" aria-hidden="true"></i>
+            </button>
+          </ng-container>
+          <input class="generic-tool color-picker" *ngIf="config.showColorPicker" matInput type="color"
+                 [(ngModel)]="toolManager.drawColor" (ngModelChange)="toolManager.drawColor=$event" value="#127bdc"
+                 [disabled]="isToolBarActive" matToolTip="Select Draw Color">
+          <input class="generic-tool color-picker" *ngIf="config.showColorPicker" matInput type="color"
+                 [(ngModel)]="toolManager.fillColor" (ngModelChange)="toolManager.fillColor=$event" value="#ffffff"
+                 [disabled]="isToolBarActive" matToolTip="Select Fill Color">
+          <input matInput class="generic-tool draw-width-selector" *ngIf="config.showColorPicker"
+                 title="Annotation Drawing Width" [ngModel]="toolManager.strokeWidth"
+                 (ngModelChange)="changeStrokeWidth($event)" type="number" name="strokeInput" value="2" min="1" max="9"
+                 [disabled]="isToolBarActive" matToolTip="Select Draw Width"/>
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="canvas-div" #canvasContainer>
+      <div *ngIf="showOriginal | async">
+        <app-paper-canvas #originalCanvas [width]="canvas.width" [height]="canvas.height" maxHeight="700"
+                      (canvasInit)="onCanvasInit($event)"></app-paper-canvas>
+        <p class="pull-original-indicator" aria-hidden="true" draggable="true" (drag)="onExpandOriginalDrag($event)"
+           (dragend)="onExpandOriginalEnd($event)" (dragstart)="onExpandOriginalDragStart($event)">
+          <i aria-hidden="true" class="fa fa-angle-double-down"></i>
+        </p>
+      </div>
+      <div class="unroll-canvas">
+        <ng-container *ngIf="toolManager.unrollStatus == Unroll.INITIALIZING">
+          <div class="text-muted" [style.paddingTop]="'10px'">
+            <span #unrollLabel class="h3 pull-left">Unrolling Iris...</span>
+            <p class="text-center"><i class="fa fa-3x fa-spin fa-circle-o-notch" aria-hidden="true"
+                                      [style.marginLeft.px]="unrollLabel.clientWidth * -1"></i></p>
+          </div>
+        </ng-container>
+        <div [hidden]="toolManager.unrollStatus != Unroll.RECT_DRAWN">
+          <div [hidden]="!(showUnrolled | async)">
+            <app-paper-canvas #unrollCanvas [width]="rectCanvas.width" [height]="rectCanvas.height"
+                          (canvasInit)="onRectCanvasInit($event)"></app-paper-canvas>
+            <p class="pull-unrolled-indicator" aria-hidden="true" draggable="true" (drag)="onExpandUnrolledDrag($event)"
+               (dragend)="onExpandUnrolledEnd($event)" (dragstart)="onExpandUnrolledDragStart($event)">
+              <i aria-hidden="true" class="fa fa-angle-double-down"></i>
+            </p>
+          </div>
+          <button style="padding-left: 10px;" class="btn btn-primary btn-sm" type="button" autocomplete="off"
+                  (click)="updateUnroll()" [disabled]="isToolBarActive">Update Unroll
+          </button>
+        </div>
+      </div>
+    </div>
+  </mat-drawer-container>
+  <div class="group-select" *ngIf="toolManager.selectedAnnotation !== undefined">
+    <span class="text-muted">Active Group:</span>
+    {{toolManager.selectedAnnotation.text}}
+  </div>
+</div>
+
+<!-- Resubmit Modal -->
+<ng-template #resubmitModal>
+  <h4 mat-dialog-title id="resubmitModalTitle" style="text-align: center">Image Resubmission</h4>
+  <table class="table table-striped" aria-describedby="Table of Optional Services to Submit Image To">
+    <th scope="col">Select the services you want applied</th>
+    <tr *ngFor="let service of allServicesButTshepii">
+      <mat-checkbox class="resubmit-checkbox" [disabled]="service.status != serviceStatusStatusType.Online" (change)="addServiceToSelected(service)">{{service.displayName | titlecase}}</mat-checkbox>
+    </tr>
+    <tr *ngFor="let service of tshepiiAndAnnotationServiceOnly">
+      <mat-checkbox class="resubmit-checkbox"
+        [disabled]="service.status != serviceStatusStatusType.Online || (!isReview) || 
+        (service.name == 'tshepii' && (loadedProbeImage.image == null || loadedCandidateImage.image == null)) ||
+        (service.name == 'annotation' && loadedProbeImage == null && loadedCandidateImage == null)"
+        (change)="addServiceToSelected(service)">{{service.displayName | titlecase}}</mat-checkbox>
+    </tr>
+    <mat-hint class="tshepii-hints" *ngIf="!isReview">Tshepii and Annotation can only be used for Review Cases</mat-hint>
+    <mat-hint class="tshepii-hints"
+              *ngIf="isReview && (loadedProbeImage.image == null || loadedCandidateImage.image == null)">Tshepii must
+      have two images
+    </mat-hint>
+  </table>
+  <div mat-dialog-actions class="confirm-cancel-btn-group">
+    <button mat-button class="mr-md-2" (click)="cancelResubmission()">Cancel</button>
+    <button mat-raised-button color="primary" (click)="resubmitImage(isReview)"
+            [disabled]="!allServicesErrorOrDisabled && serviceSelected.length <= 0">
+      Resubmit
+    </button>
+  </div>
+</ng-template>
+

@@ -1,0 +1,68 @@
+<!-- 
+    NOTICE
+ 
+    This software (or technical data) was produced for the U. S. Government 
+    and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+    (May 2014) – Alternative IV (Dec 2007)
+
+    (c) 2024 The MITRE Corporation. All Rights Reserved.
+-->
+<ul class="list-group" *ngIf="history.curr">
+  <!-- For past states -->
+  <ng-container *ngFor="let state of history.past; index as idx">
+    <ng-container *ngTemplateOutlet="stateTemplate; context: {state: state, idx: idx}"></ng-container>
+  </ng-container>
+  <!-- For curr state -->
+  <ng-container *ngTemplateOutlet="stateTemplate; context: {state: history.curr, idx: -1}">
+  </ng-container>
+
+  <!-- Template for displaying state -->
+  <ng-template #stateTemplate let-state="state" let-idx="idx">
+    <li class="list-group-item state-wrapper">
+      <div class="state">
+        <div class="list-group-item-heading">
+          <span>{{ getStateName(state.type) }}</span>
+          <i aria-hidden="true" *ngIf="idx >= 0" class="fa fa-reply-all revert-btn" (click)="revertTo(idx)"
+             matTooltip="Revert to this state"></i>
+        </div>
+        <div class="list-group-item-text">
+          <i aria-hidden="true" class="fa fa-fw mr-sm {{state.annotation.annoIcon}}"
+             *ngIf="!!state.annotation && isAddRemove(state.type)"></i>
+          <span class="text-muted">{{ getStateText(state) }}</span>
+        </div>
+      </div>
+      <ng-container *ngIf="isGroup(state.type) &&
+                         state.data &&
+                         state.data['revertTo']">
+        <ng-container
+          *ngTemplateOutlet="annoTemplateRef; context: { $implicit: state.data['revertTo'] }"></ng-container>
+      </ng-container>
+    </li>
+  </ng-template>
+
+  <!-- Template to render children of groups -->
+  <ng-template #annoTemplateRef let-items>
+    <ul class="list-group anno-wrapper">
+      <ng-container *ngFor="let parentId of getItemsKeys(items)">
+        <li *ngFor="let obj of items[parentId]"
+            class="list-group-item anno">
+          <ng-container *ngIf="itemsMap[obj.id]">
+            <i aria-hidden="true" class="fa fa-fw mr-sm {{itemsMap[obj.id]['annotation'].annoIcon}}"
+               *ngIf="!!itemsMap[obj.id]['annotation']"></i>
+            <span class="list-group-item-text">
+              {{ getAnnotationText(itemsMap[obj.id]['annotation']) }}
+            </span>
+            <ng-container *ngIf="itemsMap[obj.id]['annotation'].hasChildren()">
+              <ng-container *myLet="getStateWithAnnotationId(obj.id) as _state">
+                <ng-container *ngIf="_state && _state.data && _state.data['revertTo']">
+                  <ng-container
+                    *ngTemplateOutlet="annoTemplateRef; context: {$implicit: _state.data['revertTo']}"></ng-container>
+                </ng-container>
+              </ng-container>
+            </ng-container>
+          </ng-container>
+        </li>
+      </ng-container>
+    </ul>
+  </ng-template>
+</ul>

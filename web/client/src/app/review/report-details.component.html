@@ -1,0 +1,158 @@
+<!-- 
+    NOTICE
+ 
+    This software (or technical data) was produced for the U. S. Government 
+    and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+    (May 2014) – Alternative IV (Dec 2007)
+
+    (c) 2024 The MITRE Corporation. All Rights Reserved.
+-->
+<form #reportForm="ngForm">
+  <div class="card panel-default" style="margin-bottom: 3%">
+    <div class="card-header">Info</div>
+    <div class="card-body">
+      <div class="form-horizontal">
+        <mat-form-field class="w-100">
+          <mat-label>Comparison Date</mat-label>
+          <input matInput id="comparisonInputDate" class="form-control"  #comparisonInputDate="ngModel" name="comparisonInputDate" [matDatepicker]="comparePicker" [max]="this.initDate"
+          [ngModel]="this.comparisonDate" (ngModelChange)="setComparisonFormField($event)" required>
+          <mat-error *ngIf="comparisonInputDate.invalid">Comparison Date must not be a future date.</mat-error>
+          <mat-datepicker-toggle matSuffix [for]="comparePicker"></mat-datepicker-toggle>
+          <mat-datepicker #comparePicker></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field class="w-100">
+          <mat-label>Received Date</mat-label>
+          <input matInput id="receivedInputDate" class="form-control" #receivedInputDate="ngModel" name="receivedInputDate" [matDatepicker]="receivedPicker" [max]="this.initDate"
+          [ngModel]="this.receivedDate" (ngModelChange)="setReceivedFormField($event)" required>
+          <mat-error *ngIf="receivedInputDate.invalid">Received Date must not be a future date.</mat-error>
+          <mat-datepicker-toggle matIconSuffix [for]="receivedPicker"></mat-datepicker-toggle>
+          <mat-datepicker #receivedPicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+
+  <div class="card panel-default" style="margin-bottom: 3%">
+    <div class="card-header">Conducted By</div>
+    <div class="card-body">
+      <div class="form-horizontal">
+        <mat-form-field class="w-100">
+          <mat-label>Name</mat-label>
+          <input matInput id="conductedInputName" type="text" readonly class="form-control" name="conductedInputName"
+                 placeholder="Full Name" #conductedInputName="ngModel" [(ngModel)]="this.currentProfile.name"
+                 minLength="2" maxLength="40" pattern="[a-zA-Z, \-, _]{2,40}">
+          <mat-error *ngIf="conductedInputName.invalid">Entry must be 2-40 alpha characters.</mat-error>
+        </mat-form-field>
+        <mat-form-field class="w-100">
+          <mat-label>Email</mat-label>
+          <input matInput id="conductedInputEmail" type="email" readonly class="form-control" name="conductedInputEmail"
+                 placeholder="Email email@example.com" #conductedInputEmail="ngModel"
+                 [(ngModel)]="this.currentProfile.email" maxLength="40"
+                 pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}">
+          <mat-error *ngIf="conductedInputEmail.invalid">The email is invalid. email&#64;example.com</mat-error>
+        </mat-form-field>
+        <mat-form-field class="w-100">
+          <mat-label>Phone</mat-label>
+          <input matInput id="conductedInputPhone" type="email" readonly class="form-control" name="conductedInputPhone"
+                 placeholder="Phone xxx-xxx-xxxx" #conductedInputPhone="ngModel"
+                 [(ngModel)]="this.currentProfile.phoneNumber" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" minlength="12"
+                 maxlength="12">
+          <mat-error *ngIf="conductedInputPhone.invalid">The entry is invalid. xxx-xxx-xxxx</mat-error>
+        </mat-form-field>
+        <mat-form-field class="w-100">
+          <mat-label>Title</mat-label>
+          <input matInput id="conductedInputTitle" type="text" readonly class="form-control" name="conductedInputTitle"
+                 placeholder="Title" #conductedInputTitle="ngModel" [(ngModel)]="this.currentProfile.title"
+                 maxLength="40">
+          <mat-error *ngIf="conductedInputTitle.invalid">Entry must be less than 40 characters.</mat-error>
+        </mat-form-field>
+        <mat-form-field class="w-100">
+          <mat-label>Department</mat-label>
+          <input matInput id="conductedInputDepartment" type="text" readonly class="form-control"
+                 name="conductedInputDepartment" placeholder="Department" #conductedInputDepartment="ngModel"
+                 [(ngModel)]="this.currentProfile.department" maxLength="40">
+          <mat-error *ngIf="conductedInputDepartment.invalid">Entry must be less than 40 characters.</mat-error>
+        </mat-form-field>
+        <mat-form-field class="w-100">
+          <mat-label>Address</mat-label>
+          <input matInput id="conductedInputAddress" type="text" readonly class="form-control"
+                 name="conductedInputAddress" placeholder="Address" #conductedInputAddress="ngModel"
+                 [(ngModel)]="this.currentProfile.address" maxLength="100">
+          <mat-error *ngIf="conductedInputAddress.invalid">Entry must be less than 100 characters.</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+
+  <div class="card panel-default requestGroup">
+    <div class="card-header">Requested By
+      <mat-form-field appearance="fill">
+        <mat-select [(value)]="selected">
+          <mat-option value="No Selection" (click)="requestedBySelected(noSelectionRequestPerson)">
+            No Selection
+          </mat-option>
+          <mat-option [value]="person" *ngFor="let person of persons" (click)="requestedBySelected(person)"
+                      isAutoSelected="ngModel">
+            {{person.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="card-body">
+      <div class="form-horizontal">
+        <mat-form-field class="w-100" id="requestedNameFormField">
+          <mat-label>Name</mat-label>
+          <input matInput id="requestedInputName" type="text" class="form-control" name="requestedInputName"
+                 placeholder="Full Name" #requestedInputName="ngModel" (blur)="checkRequesterFields()"
+                 [required]="this.isNameRequired" [readonly]="isAutoSelected"
+                 [(ngModel)]="caseInformation.requestedBy.name" minlength="2" maxlength="40" pattern="[a-zA-Z, \-, _]{2,40}">
+          <mat-error *ngIf="requestedInputName.invalid">
+            <span *ngIf="this.isNameRequired"> This field is required.</span>
+            <span *ngIf="requestedInputName.invalid"> Name must be 2-40 alpha characters. {{requestForm.invalid}}</span>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="w-100" id="requestEmailFormField">
+          <mat-label>Email</mat-label>
+          <input matInput id="requestedInputEmail" type="email" class="form-control" name="requestedInputEmail"
+                 placeholder="email@example.com" #requestedInputEmail="ngModel" (blur)="checkRequesterFields()"
+                 [(ngModel)]="caseInformation.requestedBy.email" maxLength="40" [readonly]="isAutoSelected"
+                 pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}">
+          <mat-error *ngIf="requestedInputEmail.invalid">The email is invalid. Example: email&#64;example.com</mat-error>
+        </mat-form-field>
+        <mat-form-field class="w-100" id="requestPhoneFormField">
+          <mat-label>Phone</mat-label>
+          <input matInput id="requestedInputPhone" type="email" class="form-control" name="requestedInputPhone"
+                 placeholder="Phone xxx-xxx-xxxx" #requestedInputPhone="ngModel" (blur)="checkRequesterFields()"
+                 [(ngModel)]="caseInformation.requestedBy.phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+                 [readonly]="isAutoSelected"
+                 minlength="12" maxlength="12">
+          <mat-error *ngIf="requestedInputPhone.invalid">The entry is invalid. Please use the format: xxx-xxx-xxxx</mat-error>
+        </mat-form-field>
+        <mat-form-field class="w-100" id="requestTitleFormField">
+          <mat-label>Title</mat-label>
+          <input matInput id="requestedInputTitle" type="text" class="form-control" name="requestedInputTitle"
+                 placeholder="Title" #requestedInputTitle="ngModel" (blur)="checkRequesterFields()"
+                 [readonly]="isAutoSelected"
+                 [(ngModel)]="caseInformation.requestedBy.title" maxLength="40">
+          <mat-error *ngIf="requestedInputTitle.invalid">Entry must be less than 40 characters.</mat-error>
+        </mat-form-field>
+        <mat-form-field class="w-100" id="requestDeptFormField">
+          <mat-label>Department</mat-label>
+          <input matInput id="requestedInputDepartment" type="text" class="form-control" name="requestedInputDepartment"
+                 placeholder="Department" #requestedInputDepartment="ngModel" (blur)="checkRequesterFields()"
+                 [readonly]="isAutoSelected"
+                 [(ngModel)]="caseInformation.requestedBy.department" maxLength="40">
+          <mat-error *ngIf="requestedInputDepartment.invalid">Entry must be less than 40 characters.</mat-error>
+        </mat-form-field>
+        <mat-form-field class="w-100" id="requestAddressFormField">
+          <mat-label>Address</mat-label>
+          <input matInput id="requestedInputAddress" type="text" class="form-control" name="requestedInputAddress"
+                 placeholder="Address" #requestedInputAddress="ngModel" (blur)="checkRequesterFields()"
+                 [readonly]="isAutoSelected"
+                 [(ngModel)]="caseInformation.requestedBy.address" maxLength="100">
+          <mat-error *ngIf="requestedInputAddress.invalid">Entry must be less than 100 characters.</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+</form>

@@ -1,0 +1,67 @@
+<!-- 
+    NOTICE
+ 
+    This software (or technical data) was produced for the U. S. Government 
+    and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+    (May 2014) – Alternative IV (Dec 2007)
+
+    (c) 2024 The MITRE Corporation. All Rights Reserved.
+-->
+<ng-template #layerTemplateRef let-items>
+  <ul class="list-group">
+    <li *ngFor="let item of items; index as idx;" class="list-group-item item-wrapper">
+      <div class="item" (mouseenter)="itemMouseOn(item.id)" (mouseleave)="itemMouseOff(item.id)"
+           *myLet="item.hasChildren() as isGroup"
+           [class.layer]="!isGroup"
+           [class.group]="isGroup"
+           [class.item-selected]="selectedIds.includes(item.id) && !defocusLayers"
+           [class.item-defocused]="selectedIds.includes(item.id) && defocusLayers"
+           (click)="selectItem(item, idx, $event)">
+        <div class="list-group-item-heading item-title" *myLet="isAnnotationHidden(item.id) as hidden">
+          <div *ngIf="isGroup" class="item-icon collapse-toggle-btn pointer"
+               (click)="toggleClicked(item)">
+            <i aria-hidden="true" class="fa fa-sm fa-fw"
+               [class.fa-chevron-up]="item.isDropdownToggled"
+               [class.fa-chevron-down]="!item.isDropdownToggled"></i>
+          </div>
+          <div class="item-icon" *ngIf="!isGroup">
+            <ng-container #faIcons *ngIf="item.iconType == 'fa'">
+              <i aria-hidden="true" class="fa {{item.annoIcon}} fa-sm fa-fw"></i>
+            </ng-container>
+            <ng-container #materialIcons *ngIf="item.iconType == 'material'" aria-hidden="true">
+              <mat-icon class="material-icon icon-align-middle">{{item.annoIcon}}</mat-icon>
+            </ng-container>
+          </div>
+          <input type="text" [(ngModel)]="item.text" [disabled]="item.parentId == null"/>
+          <ng-container>
+            <i aria-hidden="true" class="fa fa-fw text-muted pointer pr-1" [class.fa-eye]="!hidden" [class.fa-eye-slash]="hidden"
+               (click)="showHideItem(item.id)"></i>
+          </ng-container>
+          <i aria-hidden="true" style="color:#ff3f80" class="fa fa-trash pointer" (click)="removeItem(item)"></i>
+        </div>
+        <div class="list-group-item-text text-muted" *ngIf="!isGroup">
+          {{ getAnnotationText(item) }}
+        </div>
+      </div>
+      <ng-container *ngIf="item.hasChildren() && item.isDropdownToggled">
+        <!--Allow this template to be used recursively, if we've got children nodes-->
+        <ng-container *ngTemplateOutlet="layerTemplateRef; context: {$implicit: item.children}"></ng-container>
+      </ng-container>
+    </li>
+  </ul>
+</ng-template>
+<div class="list-container">
+  <ng-container *ngTemplateOutlet="layerTemplateRef; context: {$implicit: annotations}"></ng-container>
+</div>
+
+<footer>
+  <button mat-raised-button class="btn-sm mat-primary mr-sm" (click)="expandAllGroups()" matTooltip="Expand all groups">
+    <span class="material-symbols-rounded">expand</span>
+  </button>
+  <button mat-raised-button class="btn-sm mat-primary mr-2" (click)="collapseAllGroups()"
+          matTooltip="Collapse all groups">
+    <span class="material-symbols-rounded">compress</span>
+  </button>
+  <button mat-raised-button class="btn-sm mat-primary" (click)="group()" matTooltip="Group selected items">Group</button>
+</footer>
+

@@ -1,0 +1,25 @@
+/* 
+* NOTICE
+*  
+* This software (or technical data) was produced for the U. S. Government
+* and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV
+* (May 2014) – Alternative IV (Dec 2007)
+* 
+* (c) 2024 The MITRE Corporation. All Rights Reserved.
+*/ 
+
+.dropdown-item, .site-title {
+  cursor: pointer;
+}
+
+#app-toolbar {
+  position: fixed;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 3px 5px -1px rgba(0, 0, 0, .2), 0 6px 10px 0 rgba(0, 0, 0, .14), 0 1px 18px 0 rgba(0, 0, 0, .12);
+}
+
+#center-content {
+  margin-top: 80px;
+}
+

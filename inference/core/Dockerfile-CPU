@@ -1,0 +1,74 @@
+#
+# NOTICE
+# 
+# This software (or technical data) was produced for the U. S. Government 
+# and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+# (May 2014) - Alternative IV (Dec 2007)
+# 
+# (c) 2026 The MITRE Corporation. All Rights Reserved.
+# 
+
+FROM debian:bookworm-slim AS base
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        bzip2 build-essential ca-certificates curl wget python3-pip \
+        libjpeg-dev libpng-dev libtiff-dev \
+        libc-dev libc-dev-bin linux-libc-dev \
+        zlib1g-dev libbz2-dev liblzma-dev unzip && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Building on some infrastructure requires the installation of a certificate authority. This is OPTIONAL
+# for external systems and will only be installed when the ca_file secret is provided in the build command.
+RUN --mount=type=secret,id=ca_file,required=false \
+    if [ -f /run/secrets/ca_file ]; then \
+       cat /run/secrets/ca_file >> /etc/ssl/certs/ca-certificates.crt; \
+    fi
+
+RUN wget https://repo.anaconda.com/miniconda/Miniconda3-py312_24.1.2-0-Linux-x86_64.sh && \
+    bash Miniconda3-py312_24.1.2-0-Linux-x86_64.sh -b && \
+    rm Miniconda3-py312_24.1.2-0-Linux-x86_64.sh
+
+ENV PATH="/root/miniconda3/bin:${PATH}"
+
+RUN conda config --set ssl_verify /etc/ssl/certs/ca-certificates.crt && \
+    conda config --append channels pytorch && \
+    conda config --append channels conda-forge && \
+    conda update -y conda && \
+    conda --version && \
+    python3 --version
+
+COPY requirements/conda_cpu.txt /tmp/
+RUN conda install -y --file /tmp/conda_cpu.txt && \
+    conda clean --all -f -y
+
+COPY requirements/pip_cpu.txt /tmp/
+RUN pip3 install --upgrade pip setuptools && \
+    pip3 install --no-cache-dir -r /tmp/pip_cpu.txt
+
+###############################################################    
+
+FROM debian:bookworm-slim
+
+ENV PATH="/root/miniconda3/bin:${PATH}"
+ENV USE_CUDA="False"
+
+COPY --from=base /root/miniconda3 /root/miniconda3
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ca-certificates curl libjpeg-dev libpng-dev libtiff-dev \
+        libc-dev libc-dev-bin linux-libc-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /usr/share/iris-annotation
+
+COPY src/segment ./segment
+COPY src/config.py src/utility.py src/main.py src/mq-main.py src/Messages_pb2.py src/IrisAnnotation_pb2.py ./
+COPY src/models /usr/share/models
+
+RUN mkdir -p /mnt/host/input /mnt/host/dataset /mnt/host/tmp
+
+CMD [ "python3", "/usr/share/iris-annotation/mq-main.py" ]

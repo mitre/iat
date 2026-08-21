@@ -1,0 +1,31 @@
+/* 
+* NOTICE
+*  
+* This software (or technical data) was produced for the U. S. Government
+* and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV
+* (May 2014) – Alternative IV (Dec 2007)
+* 
+* (c) 2024 The MITRE Corporation. All Rights Reserved.
+*/ 
+
+syntax = "proto3";
+
+package org.mitre.iwp.buffers;
+
+message AciiServiceResponse {
+    string imageId = 1;
+    HorizontalAlignment horizontal = 2;
+    VerticalAlignment vertical = 3;
+}
+
+enum HorizontalAlignment {
+    UnknownHorizontal = 0;
+    Left = 1;
+    Right = 2;
+}
+
+enum VerticalAlignment {
+    UnknownVertical = 0;
+    Up = 1;
+    Down = 2;
+}

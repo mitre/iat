@@ -1,0 +1,231 @@
+<!-- 
+    NOTICE
+ 
+    This software (or technical data) was produced for the U. S. Government 
+    and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+    (May 2014) – Alternative IV (Dec 2007)
+
+    (c) 2024 The MITRE Corporation. All Rights Reserved.
+-->
+<div class="col-md-12">
+  <div class="container settings-container">
+    <mat-card appearance="outlined" class="card-tab-groups">
+      <mat-card-content>
+        <mat-tab-group mat-stretch-tabs="false">
+          <!-- PROFILE TAB -->
+          <mat-tab label="Profile">
+            <form #editForm="ngForm">
+
+              <!-- Agency Section -->
+              <h5>Agency Information:</h5>
+              <div class="mt-4">
+                <mat-form-field class="w-100">
+                  <mat-label>Destination Agency Identifier</mat-label>
+                  <input matInput placeholder="Destination Agency Identifier" type="text" pattern="[a-zA-Z0-9]{9}"
+                         maxLength="9" #currentDai="ngModel" name="currentDai" [disabled]="!canEdit"
+                         [(ngModel)]="currentProfile.destinationAgencyIdentifier">
+                </mat-form-field>
+                <div [hidden]="currentDai.valid || currentDai.pristine || !canEdit" class="alert alert-danger">
+                  <strong>ERROR!
+                  </strong>The destination agency identifier must be 9 alphanumeric characters
+                </div>
+                <mat-form-field class="w-100">
+                  <mat-label>Originating Agency Identifier</mat-label>
+                  <input matInput placeholder="Originating Agency Identifier" type="text" pattern="[a-zA-Z0-9]{9}"
+                         maxLength="9" #currentOri="ngModel" name="currentOri" [disabled]="!canEdit"
+                         [(ngModel)]="currentProfile.originatingAgencyIdentifier">
+                </mat-form-field>
+                <div [hidden]="currentOri.valid || currentOri.pristine || !canEdit" class="alert alert-danger">
+                  <strong>ERROR!
+                  </strong>The originating agency identifier must be 9 alphanumeric characters
+                </div>
+                <mat-form-field class="w-100">
+                  <mat-label>Attention Indicator</mat-label>
+                  <input matInput placeholder="Attention Indicator" type="text" pattern="^[^\.]+" #currentAtn="ngModel"
+                         name="currentAtn" [disabled]="!canEdit" [(ngModel)]="currentProfile.attentionIndicator">
+                </mat-form-field>
+                <div [hidden]="currentAtn.valid || currentAtn.pristine || !canEdit" class="alert alert-danger">
+                  <strong>ERROR!
+                  </strong>A transaction must have an attention indicator and it must not contain a '.'
+                </div>
+                <mat-form-field class="w-100">
+                  <mat-label>Source Agency</mat-label>
+                  <input matInput placeholder="Source Agency" type="text" pattern="[a-zA-Z0-9]{9}" maxLength="9"
+                         #currentSrc="ngModel" name="currentSrc" [disabled]="!canEdit"
+                         [(ngModel)]="currentProfile.sourceAgency">
+                </mat-form-field>
+                <div [hidden]="currentSrc.valid || currentSrc.pristine || !canEdit" class="alert alert-danger">
+                  <strong>ERROR!
+                  </strong>A source agency must be 9 alphanumeric characters
+                </div>
+                <div class="pb-3">
+                  <mat-checkbox name="reportExclude" #reportExclude="ngModel"
+                                [(ngModel)]="currentProfile.isReportExclude" [disabled]="!canEdit"
+                                [checked]="currentProfile.isReportExclude">Exclude from Report?
+                  </mat-checkbox>
+                </div>
+              </div>
+
+              <!-- Personal Information Section -->
+              <mat-divider></mat-divider>
+              <br>
+              <h5>Personal Information:</h5>
+              <div class="mt-4">
+                <mat-form-field class="w-100">
+                  <mat-label>Full Name</mat-label>
+                  <input matInput placeholder="Full Name" [disabled]="!canEdit" name="conductedInputName"
+                         #conductedInputName="ngModel" [(ngModel)]="currentProfile.fullName" maxLength="40"
+                         pattern="[a-zA-Z, \-, _]{2,40}">
+                </mat-form-field>
+                <div [hidden]="conductedInputName.valid || conductedInputName.pristine || !canEdit"
+                     class="alert alert-danger">Entry must be 2-40 alpha characters.
+                </div>
+                <mat-form-field class="w-100">
+                  <mat-label>Email</mat-label>
+                  <input matInput placeholder="Email" type="email" [disabled]="!canEdit" name="conductedInputEmail"
+                         #conductedInputEmail="ngModel" [(ngModel)]="currentProfile.email" maxLength="40"
+                         pattern="[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,4}">
+                </mat-form-field>
+                <div [hidden]="conductedInputEmail.valid || conductedInputEmail.pristine || !canEdit"
+                     class="alert alert-danger">The email is invalid. Example email: email&#64;example.com
+                </div>
+                <mat-form-field class="w-100">
+                  <mat-label>Phone Number</mat-label>
+                  <input matInput placeholder="Phone Number" type="email" [disabled]="!canEdit" name="conductedInputPhone" #conductedInputPhone="ngModel" [(ngModel)]="currentProfile.phoneNumber" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" minlength="12" maxlength="12">
+                </mat-form-field>
+                <div [hidden]="conductedInputPhone.valid || conductedInputPhone.pristine || !canEdit"
+                     class="alert alert-danger">The entry is invalid. Use the format: xxx-xxx-xxxx
+                </div>
+                <mat-form-field class="w-100">
+                  <mat-label>Title</mat-label>
+                  <input matInput placeholder="Title" type="text" [disabled]="!canEdit" name="conductedInputTitle"
+                         #conductedInputTitle="ngModel" [(ngModel)]="currentProfile.title" maxLength="40">
+                </mat-form-field>
+                <div [hidden]="conductedInputTitle.valid || conductedInputTitle.pristine || !canEdit"
+                     class="alert alert-danger">Entry must be less than 40 characters.
+                </div>
+                <mat-form-field class="w-100">
+                  <mat-label>Department</mat-label>
+                  <input matInput placeholder="Department" type="text" [disabled]="!canEdit"
+                         name="conductedInputDepartment" #conductedInputDepartment="ngModel"
+                         [(ngModel)]="currentProfile.department" maxLength="40">
+                </mat-form-field>
+                <div [hidden]="conductedInputDepartment.valid || conductedInputDepartment.pristine || !canEdit"
+                     class="alert alert-danger">Entry must be less than 40 characters.
+                </div>
+                <mat-form-field class="w-100">
+                  <mat-label>Address</mat-label>
+                  <input matInput placeholder="Address" type="text" [disabled]="!canEdit" name="conductedInputAddress"
+                         #conductedInputAddress="ngModel" [(ngModel)]="currentProfile.address" maxLength="100">
+                </mat-form-field>
+                <div [hidden]="conductedInputAddress.valid || conductedInputAddress.pristine || !canEdit"
+                     class="alert alert-danger">Entry must be less than 100 characters.
+                </div>
+              </div>
+
+              <!-- Annotation Section -->
+              <mat-divider></mat-divider>
+              <br>
+              <h5>Annotations:</h5>
+              <div class="mt-4">
+                <mat-form-field class="w-100">
+                  <mat-label>Stroke Width</mat-label>
+                  <input matInput placeholder="Stroke Width" id="currentStrokeWidth" type="number"
+                         #currentStrokeWidth="ngModel" name="currentStrokeWidth" [disabled]="!canEdit"
+                         [(ngModel)]="currentProfile.userSetting.strokeWidth" [appMin]="1" [appMax]="10">
+                  <mat-error
+                    *ngIf="currentStrokeWidth.hasError('invalidMax') || currentStrokeWidth.hasError('invalidMin')">
+                    Stroke width must be between 1 & 10
+                  </mat-error>
+                </mat-form-field>
+                <div class="w-100">
+                  <label [class.text-muted]="!canEdit">Default Draw Color</label>
+                  <div class="pb-3">
+                    <input [disabled]="!canEdit" class="generic-tool color-picker" matInput type="color"
+                           name="drawColor"
+                           [(ngModel)]="currentProfile.userSetting.drawColor"/>
+                  </div>
+                  <br>
+                </div>
+                <div class="w-100">
+                  <label [class.text-muted]="!canEdit">Default Fill Color</label>
+                  <div class="pb-3">
+                    <input [disabled]="!canEdit" class="generic-tool color-picker" matInput type="color"
+                           name="fillColor"
+                           [(ngModel)]="currentProfile.userSetting.fillColor"/>
+                  </div>
+                  <br>
+                </div>
+                <div class="w-100">
+                  <label [class.text-muted]="!canEdit">TSHEPII Polygon Stroke Opacity</label>
+                  <div class="text-center">
+                    <label>{{ currentProfile.userSetting.tshepiiStrokeOpacity }}%</label>
+                  </div>
+                  <mat-slider class="w-100" discrete min="1" max="100">
+                    <input matSliderThumb name="tshepiiStrokeOpacityInput" [disabled]="!canEdit"  [(ngModel)]="currentProfile.userSetting.tshepiiStrokeOpacity" />
+                  </mat-slider>
+                </div>
+                <mat-form-field class="w-100">
+                  <mat-label>Number of History Files</mat-label>
+                  <select matNativeControl [disabled]="!canEdit" [(ngModel)]="currentProfile.userSetting.numHistory"
+                          (ngModelChange)="currentProfile.userSetting.numHistory=$event" #currentNumHistory="ngModel"
+                          name="currentNumHistory">
+                    <option *ngFor="let num of numHistory" [ngValue]="num">
+                      {{ num }}
+                    </option>
+                  </select>
+                </mat-form-field>
+              </div>
+              <br><br>
+              <div class="form-group text-right">
+                <button mat-raised-button color="accent" class="mr-2" [disabled]="!canEdit"
+                        (click)="resetProfile()">Reset
+                </button>
+                <button mat-raised-button color="primary" type="button" (click)="saveProfile()"
+                        [disabled]="canEdit && !isProfileValid()">{{ !canEdit ? "Edit" : "Save" }}</button>
+              </div>
+            </form>
+          </mat-tab>
+
+          <!-- CHANGE PASSWORD TAB -->
+          <mat-tab class="w-1" label="Change Password">
+            <form #passwordForm="ngForm" appPasswordMatcher method="post" password1="newPasswordInput"
+                  password2="confirmPasswordInput">
+              <h5>Password:</h5>
+              <div class="mt-4">
+                <mat-form-field class="w-100">
+                  <input matInput type="password" placeholder="Current Password" name="currentPasswordInput"
+                        #currentPasswordInput="ngModel" [(ngModel)]="currentPassword">
+                  <mat-error *ngIf="currentPasswordInput.hasError('badPassword')">Incorrect password</mat-error>
+                </mat-form-field>
+                <mat-form-field class="w-100">
+                  <input matInput [type]="passwordVisible?'text':'password'" placeholder="New Password"
+                        name="newPasswordInput" #newPasswordInput="ngModel" maxlength="64" minlength="8"
+                        [(ngModel)]="newPassword">
+                  <span matSuffix [class]="passwordVisible?'fa fa-eye-slash':'fa fa-eye'"
+                        (click)="showHidePassword()"></span>
+                  <mat-error *ngIf="newPasswordInput.errors">
+                    New password must be between 8 & 64 characters.
+                  </mat-error>
+                </mat-form-field>
+                <mat-form-field class="w-100">
+                  <input matInput [type]="passwordVisible?'text':'password'" name="confirmPasswordInput"
+                        placeholder="Confirm Password" #confirmPasswordInput="ngModel" [(ngModel)]="confirmPassword">
+                  <mat-error *ngIf="passwordForm.hasError('passwordMismatch')">
+                    Passwords do not match
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </form>
+            <div class="form-group">
+              <button mat-raised-button color="primary" (click)="updatePassword(passwordForm)"
+                      [disabled]="!(passwordForm.form.valid) || currentPassword.length == 0 || newPassword.length == 0 || !(newPassword === confirmPassword)">
+                Change Password
+              </button>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

@@ -1,0 +1,140 @@
+<!-- 
+    NOTICE
+ 
+    This software (or technical data) was produced for the U. S. Government 
+    and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+    (May 2014) – Alternative IV (Dec 2007)
+
+    (c) 2024 The MITRE Corporation. All Rights Reserved.
+-->
+<div class="container" style="padding-top: 20px;">
+  <mat-card appearance="outlined" class="card-tab-groups">
+    <mat-card-content>
+      <mat-tab-group mat-stretch-tabs="false">
+<!--        SEARCH TAB ON HISTORY PAGE-->
+        <mat-tab label="Search" id="search">
+          <table mat-table [dataSource]="searchRequestData" class="w-100" #searchSort="matSort" matSort aria-describedby="Table of Past Search Items">
+            <ng-container matColumnDef="creationDateEpoch">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Creation Date</th>
+              <td mat-cell *matCellDef="let request">{{ getDateString(request.creationDateEpoch / 1000) }}</td>
+            </ng-container>
+            <ng-container matColumnDef="cinPrefix">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Case Prefix</th>
+              <td mat-cell *matCellDef="let request">{{ request.message.cinPrefix }}</td>
+            </ng-container>
+            <ng-container matColumnDef="cinIdentifier">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Case Identifier</th>
+              <td mat-cell *matCellDef="let request">{{ request.message.cinIdentifier }}</td>
+            </ng-container>
+            <ng-container matColumnDef="caseExtension">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Case Extension</th>
+              <td mat-cell *matCellDef="let request">{{ request.message.caseExtension }}</td>
+            </ng-container>
+            <ng-container matColumnDef="destinationAgencyIdentifier">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Destination Agency</th>
+              <td mat-cell *matCellDef="let request">{{ request.message.destinationAgencyIdentifier }}</td>
+            </ng-container>
+            <ng-container matColumnDef="originatingAgencyIdentifier">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Originating Agency</th>
+              <td mat-cell *matCellDef="let request">{{ request.message.originatingAgencyIdentifier }}</td>
+            </ng-container>
+            <ng-container matColumnDef="isFinished">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Completed</th>
+              <td mat-cell *matCellDef="let request" style="text-align:center"><mat-icon *ngIf="request.isFinished">check</mat-icon></td>
+            </ng-container>
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef scope="col"></th>
+              <td mat-cell *matCellDef="let request; let i = index" class="action-cell btn-xs-wrap">
+                <button mat-raised-button color="primary" matTooltip="Editing Report" (click)="continueIrisSearch(i, request)">Continue</button>
+                <a mat-raised-button matTooltip="Download Report" href="{{'/api/iris/search/download/' + request.id}}"
+                *ngIf="request.isFinished"><i aria-hidden="true" class="fa fa-download"></i></a>
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="searchRequestColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: searchRequestColumns"></tr>
+          </table>
+          <mat-paginator #searchPaginator [pageSizeOptions]="[10, 25, 50]"></mat-paginator>
+        </mat-tab>
+<!--        REVIEW TAB ON HISTORY PAGE-->
+        <mat-tab label="Review" id="review">
+          <table mat-table [dataSource]="reviewRequestData" class="w-100" #reviewSort="matSort" matSort aria-describedby="Table of Past Review Items">
+            <ng-container matColumnDef="comparisonDate">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Comparison Date</th>
+              <td mat-cell
+                  *matCellDef="let request">{{ getDateString(request.caseInformation.comparisonDate / 1000) }}</td>
+            </ng-container>
+            <ng-container matColumnDef="transactionControlNumber">
+              <th mat-header-cell *matHeaderCellDef mat-sort-heade scope="col"r>Transaction Control Number</th>
+              <td mat-cell *matCellDef="let request">{{ request.probe.transactionControlNumber }}</td>
+            </ng-container>
+            <ng-container matColumnDef="responseType">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Response Type</th>
+              <td mat-cell *matCellDef="let request">{{ request.responseType }}</td>
+            </ng-container>
+            <ng-container matColumnDef="candidateCount">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col"># of Candidates</th>
+              <td mat-cell *matCellDef="let request">{{ request.candidates.length }}</td>
+            </ng-container>
+            <ng-container matColumnDef="requestedBy">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Requested By</th>
+              <td mat-cell *matCellDef="let request">{{ request.caseInformation.requestedBy.name }}</td>
+            </ng-container>
+            <ng-container matColumnDef="isFinished">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Completed</th>
+              <td mat-cell *matCellDef="let request">{{ request.isFinished }}</td>
+            </ng-container>
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef scope="col"></th>
+              <td mat-cell *matCellDef="let request; let i = index" class="action-cell btn-xs-wrap">
+                <button mat-raised-button color="primary" matTooltip="Editing Report" (click)="continueReview(i, request)">Continue</button>
+                <a mat-raised-button matTooltip="Download Report" href="{{'/api/iris/report/download/' + request.id}}"
+                *ngIf="request.isFinished"><i aria-hidden="true" class="fa fa-download"></i></a>
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="reviewRequestColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: reviewRequestColumns"></tr>
+          </table>
+          <mat-paginator #reviewPaginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
+        </mat-tab>
+<!--        NOTIFICATIONS TAB ON HISTORY PAGE-->
+        <mat-tab label="Notifications" id="notification">
+          <table mat-table [dataSource]="userNotificationData" class="w-100" aria-describedby="Table of Notifications">
+            <ng-container matColumnDef="receivedDate">
+              <th mat-header-cell *matHeaderCellDef scope="col">Received Date</th>
+              <td mat-cell *matCellDef="let notification">{{ getDateFromString(notification.dateCreated) }}</td>
+            </ng-container>
+            <ng-container matColumnDef="message">
+              <th mat-header-cell *matHeaderCellDef scope="col">Message</th>
+              <td mat-cell *matCellDef="let notification">{{notification.message}}</td>
+            </ng-container>
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef scope="col">Status</th>
+              <td mat-cell *matCellDef="let notification">{{notification.isNew === true ? 'New' : 'Read'}}</td>
+            </ng-container>
+            <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef scope="col">Action</th>
+              <td mat-cell *matCellDef="let notification">
+                <a href="{{notification.action}}"
+                   (click)="markNotificationRead(notification)"> {{notification.action.includes('download') === true ? 'Download' : 'Navigate' }}</a>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef scope="col"></th>
+              <td mat-cell *matCellDef="let notification">
+                <a href="{{ '/api/admin/user/notifications/download/' + notification.id}}"
+                   class="download-button btn btn-xs btn-primary">Download</a>
+                <a class='btn btn-xs btn-primary' *ngIf="notification.status === 'New'">
+                  <i aria-hidden="true" (click)='markNotificationRead(notification)'>Mark Read</i></a>
+                <a class='btn btn-xs btn-danger'><i aria-hidden="true" (click)='deleteNotification(notification)' class="fa fa-trash"></i></a>
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="userNotificationColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: userNotificationColumns"></tr>
+            <mat-paginator [pageSizeOptions]="[10, 25, 50]"></mat-paginator>
+          </table>
+          <mat-paginator #notificationPaginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,148 @@
+/* 
+* NOTICE
+*  
+* This software (or technical data) was produced for the U. S. Government
+* and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV
+* (May 2014) – Alternative IV (Dec 2007)
+* 
+* (c) 2024 The MITRE Corporation. All Rights Reserved.
+*/ 
+
+.h3 {
+  vertical-align: middle
+}
+
+.image-mode-navbar-wrapper {
+  padding: 0;
+}
+
+.image-mode-navbar {
+  border: none;
+  background: none;
+  box-shadow: none;
+  margin: 0;
+  padding: 0;
+}
+
+.image-mode-navbar > .container-fluid,
+.image-mode-navbar > .container-fluid > .navbar-collapse {
+  padding: 0;
+}
+
+.fill-space {
+  flex: 1 1 auto;
+}
+
+#help {
+  text-align: center;
+}
+
+#help > .guide {
+  display: inline-block;
+}
+
+#help > .guide ~ .guide {
+  margin-left: 15px;
+}
+
+#candidate-btn-group > button {
+  padding: 0px 4px
+}
+
+#candidate-btn-group.horizontalMode {
+  position: absolute;
+  left: -12px;
+  width: 25px;
+  top: 100px;
+}
+
+#candidate-btn-group.verticalMode {
+  text-align: center;
+}
+
+#probe-v-spacer {
+  height: 48px;
+}
+
+.card {
+  border-top-left-radius: 0;
+}
+
+.toggle-image-btns > button {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: none;
+}
+
+.toggle-image-btns > button.btn-primary {
+  background-image: none;
+  background-color: #e0e0e0;
+}
+
+.toggle-image-btns > button ~ button {
+  margin-left: 1px;
+}
+
+.dropzone {
+  height: 100%;
+}
+
+.toolbar-btn {
+  height: 38px;
+}
+
+.review-toolbar {
+  height: 48px;
+}
+
+.review-toolbar > div {
+  flex: 1;
+  display: flex;
+}
+
+.tshepii-button {
+  flex: 0;
+}
+
+.tshepii-status {
+  font-size: 12px;
+  margin-right: 15px;
+  margin-left: 3px;
+}
+
+.dualPdm-button {
+  flex: 0;
+}
+
+.dualPdm-status {
+  font-size: 12px;
+  margin-right: 15px;
+  margin-left: 3px;
+}
+
+.review-toolbar .review-controls {
+  justify-content: flex-end;
+}
+
+.custom-select {
+  min-width: 130px;
+}
+
+.unload-button-visible {
+  width: calc(100% - 75px) !important;
+}
+
+.cancel-button {
+  background-color: rgb(112, 112, 112);
+  color: white;
+  margin-right: 5px;
+}
+
+.modal-footer {
+  justify-content: space-between;
+}
+
+.right-footer {
+  justify-content: flex-end;
+  align-items: center;
+}

@@ -1,0 +1,178 @@
+#
+# NOTICE
+# 
+# This software (or technical data) was produced for the U. S. Government 
+# and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+# (May 2014) – Alternative IV (Dec 2007)
+# 
+# (c) 2024 The MITRE Corporation. All Rights Reserved.
+#
+
+#IMPORTANT!
+#To deploy this compose file, set the following environment variables in a .env file. 
+#DATABASE_PASSWORD, DATABASE_USERNAME, DATABASE_ROOT_PASSWORD, DATABASE_NAME
+#See the below docs link for details about .env files
+#https://docs.docker.com/compose/environment-variables/set-environment-variables/#compose-file
+
+services:
+  activemq:
+    image: dhi.io/activemq-artemis:2
+    container_name: activemq
+    restart: always
+    ports:
+      - 8161:8161
+      - 61616:61616
+      - 61613:61613
+    environment:
+      ARTEMIS_USER: ${ARTEMIS_USER}
+      ARTEMIS_PASSWORD: ${ARTEMIS_PASSWORD}
+      ANONYMOUS_LOGIN: true
+      EXTRA_ARGS: --http-host 0.0.0.0 --relax-jolokia
+
+  web:
+    image: ghcr.io/mitre/iat/iwp-web:26.07
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+      activemq:
+        condition: service_started
+    container_name: web
+    ports:
+      - 8080:8080
+    volumes:
+      - "./web-component/config:/app/config"
+    environment:
+      - DATABASE_HOST=iwp_mysql
+      - DATABASE_USER=${DATABASE_USERNAME}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_PORT=3306
+      - JASYPT_ENCRYPTOR_PASSWORD=${JASYPT_ENCRYPTOR_PASSWORD}
+    env_file: .env
+    platform: linux/amd64
+
+  iwp-acii:
+    image: ghcr.io/mitre/iat/iwp-acii:26.08
+    container_name: acii
+    restart: always
+    depends_on:
+      - "activemq"
+    volumes:
+      - "./acii-component/config/acii.conf.template:/etc/iwp-acii/acii.conf.template:ro"
+      - "./acii-component/config/start-acii.sh:/etc/iwp-acii/start-acii.sh:ro"
+    environment:
+      ARTEMIS_USER: ${ARTEMIS_USER}
+      ARTEMIS_PASSWORD: ${ARTEMIS_PASSWORD}
+    command: ["sh", "/etc/iwp-acii/start-acii.sh"]
+
+  iwp-biqt:
+    image: ghcr.io/mitre/iat/iwp-biqt:26.08
+    container_name: biqt
+    restart: always
+    depends_on:
+      - "activemq"
+    volumes:
+      - "./biqt-component/config:/app/config"
+    environment:
+      spring.activemq.user: ${ARTEMIS_USER}
+      spring.activemq.password: ${ARTEMIS_PASSWORD}
+    platform: linux/amd64
+
+  # Iris Annotation via CPU 
+  iwp-annotation:
+    image: ghcr.io/mitre/iat/iwp-annotation-cpu:26.07
+    container_name: annotation
+    restart: always
+    depends_on:
+      - "activemq"
+    environment:
+      - STOMP_HOST=activemq:61613
+      - STOMP_USER=${ARTEMIS_USER}
+      - STOMP_PASSWORD=${ARTEMIS_PASSWORD}
+      - STOMP_HEARTBEATS=10000,0
+    platform: linux/amd64
+
+  # Iris Annotation via GPU 
+  # iwp-annotation:
+  #   image: ghcr.io/mitre/iat/iwp-annotation-gpu:26.07
+  #   container_name: annotation
+  #   restart: always
+  #   depends_on:
+  #     - "activemq"
+  #   environment:
+  #     - STOMP_HOST=activemq:61613
+  #     - STOMP_USER=${ARTEMIS_USER:-artemis}
+  #     - STOMP_PASSWORD=${ARTEMIS_PASSWORD}
+  #     - STOMP_HEARTBEATS=10000,0
+  #   platform: linux/amd64
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: all
+  #             capabilities: [gpu]
+
+  iwp-tshepii:
+    image: ghcr.io/mitre/iat/iwp-tshepii:26.07
+    container_name: tshepii
+    restart: always
+    depends_on:
+      - "activemq"
+    volumes:
+      - "./tshepii-component/config/tshepii.conf.template:/etc/iwp-tshepii/tshepii.conf.template:ro"
+      - "./tshepii-component/config/start-tshepii.sh:/etc/iwp-tshepii/start-tshepii.sh:ro"
+      - "./tshepii-component/config/log4cxx.conf:/etc/iwp-tshepii/log4cxx.conf:ro"
+    environment:
+      ARTEMIS_USER: ${ARTEMIS_USER}
+      ARTEMIS_PASSWORD: ${ARTEMIS_PASSWORD}
+    command: ["sh", "/etc/iwp-tshepii/start-tshepii.sh"]
+    platform: linux/amd64
+
+  iwp-pdm:
+    image: ghcr.io/mitre/iat/iwp-pdm:26.08
+    container_name: pdm
+    restart: always
+    depends_on:
+      - "activemq"
+    environment:
+      STOMP_HOST: activemq:61613
+      ARTEMIS_USER: ${ARTEMIS_USER}
+      ARTEMIS_PASSWORD: ${ARTEMIS_PASSWORD}
+      STOMP_HEARTBEATS: 10000,0
+    platform: linux/amd64
+
+  mysql:
+    image: mysql:8
+    container_name: iwp_mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      # So you don't have to use root, but you can if you like
+      MYSQL_USER: ${DATABASE_USERNAME}
+      # You can use whatever password you like
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
+      MYSQL_ROOT_HOST: '%'
+    healthcheck:
+      test: mysqladmin ping -h localhost -u $$DATABASE_USERNAME --password=$$DATABASE_PASSWORD
+      interval: 1s
+      timeout: 1s
+      retries: 50
+    ports:
+      # <Port exposed> : < MySQL Port running inside container>
+      - '3306:3306'
+    expose:
+      # Opens port 3306 on the container
+      - '3306'
+    # Where our data will be persisted
+    volumes:
+      - my-db:/var/lib/mysql
+    security_opt:
+      - seccomp:unconfined
+    env_file: .env
+
+volumes:
+  my-db:

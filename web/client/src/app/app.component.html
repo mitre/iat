@@ -1,0 +1,62 @@
+<!-- 
+    NOTICE
+ 
+    This software (or technical data) was produced for the U. S. Government 
+    and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+    (May 2014) – Alternative IV (Dec 2007)
+
+    (c) 2024 The MITRE Corporation. All Rights Reserved.
+-->
+<mat-toolbar color="primary" id="app-toolbar">
+  <span class="site-title mr-2" routerLink="/home"><i aria-hidden="true" class="fa fa-eye"></i> Iris Analysis Toolkit</span>
+  <button mat-button [matMenuTriggerFor]="irisProcess">
+    Iris Processes <i aria-hidden="true" class="fa fa-caret-down"></i>
+  </button>
+  <mat-menu #irisProcess>
+    <button mat-menu-item routerLink="/create" *ngIf="privs.CREATE_SEARCH">Create EBTS</button>
+    <button mat-menu-item routerLink="/review" *ngIf="privs.CREATE_REVIEW">Review</button>
+    <button mat-menu-item routerLink="/history">History</button>
+  </mat-menu>
+  <button mat-button [matMenuTriggerFor]="adminProcess">
+    Administration Processes <i aria-hidden="true" class="fa fa-caret-down"></i>
+  </button>
+  <mat-menu #adminProcess>
+    <button mat-menu-item routerLink="/manage">Manage</button>
+    <button mat-menu-item routerLink="/admin" *ngIf="privs.USER_EDIT">Admin</button>
+    <!-- <button mat-menu-item routerLink="/export" *ngIf="privs.CASE_REPORTS">Export</button> -->
+  </mat-menu>
+  <div class="ml-auto">
+    <app-service-status matTooltip="Status of the Services"
+      [visibleColumns]="serviceItemColumns">
+    </app-service-status>
+  </div>
+  <div class="ml-md-2">
+    <app-notifications matTooltip="Report Notifications"></app-notifications>
+  </div>
+  <div class="ml-2">
+    <button mat-button [matMenuTriggerFor]="userDropdown">
+      <i aria-hidden="true" class="far fa-user-circle"></i> {{username}} <i aria-hidden="true" class="fa fa-caret-down"></i>
+    </button>
+    <mat-menu #userDropdown>
+      <button mat-menu-item routerLink="/user">Profile</button>
+      <button *ngIf="isSecure" mat-menu-item onclick="logoutForm()">Logout</button>
+    </mat-menu>
+  </div>
+</mat-toolbar>
+
+<div class="container-fluid" id="center-content">
+  <div class="text center">
+    <div id="alert_div"></div>
+  </div>
+  <router-outlet></router-outlet>
+  <div id="infoModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title"></h3>
+        </div>
+        <div class="modal-body"></div>
+      </div>
+    </div>
+  </div>
+</div>

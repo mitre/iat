@@ -1,0 +1,53 @@
+/* 
+* NOTICE
+*  
+* This software (or technical data) was produced for the U. S. Government
+* and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV
+* (May 2014) – Alternative IV (Dec 2007)
+* 
+* (c) 2024 The MITRE Corporation. All Rights Reserved.
+*/ 
+
+ul.file-list-group {
+  border-radius: .25rem;
+  border-top: 1px solid rgba(0, 0, 0, .125);
+  border-bottom: 1px solid rgba(0, 0, 0, .125);
+}
+
+.file-list-group li:first-child {
+  border-top: none;
+
+}
+
+.file-list-group li:last-child {
+  border-bottom: none;
+}
+
+.mat-column-service {
+  text-align: left;
+  padding-right: 25px;
+}
+
+.mat-column-status {
+  text-align: center;
+}
+
+.status-Error {
+  color: red;
+}
+
+.status-Loading {
+  color: transparent;
+}
+
+.status-Online {
+  color: green;
+}
+
+.status-Disabled {
+  color: lightgray;
+}
+
+.version-info {
+  font-size: 10px;
+}

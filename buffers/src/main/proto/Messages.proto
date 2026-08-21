@@ -1,0 +1,184 @@
+/* 
+* NOTICE
+*  
+* This software (or technical data) was produced for the U. S. Government
+* and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV
+* (May 2014) – Alternative IV (Dec 2007)
+* 
+* (c) 2024 The MITRE Corporation. All Rights Reserved.
+*/ 
+
+syntax = "proto3";
+
+package org.mitre.iwp.buffers;
+
+message IrisImageBuffer {
+    string correlation_id = 1;
+    bool success = 2;
+    string message = 3;
+
+    ImageBuffer image = 999;
+}
+
+message CandidateListBuffer {
+    string correlation_id = 1;
+    bool success = 2;
+    string message = 3;
+
+    repeated CandidateBuffer candidates = 4;
+}
+
+message CandidateBuffer {
+     string subject_id = 1;
+     string master_name = 2;
+     string biometric_set_identifier = 3;
+     string image_type = 4;
+     string friction_ridge_generalized_position = 5;
+     string print_position_descriptor = 6;
+     double match_score = 7;
+     string biometric_image_available = 8;
+     string name_of_designated_repository = 9;
+     string information_designation_character = 10;
+     string note = 11;
+     string pose = 12;
+     string smt_code = 13;
+     string eye_label = 14;
+
+     ImageBuffer image_buffer = 999;
+     string image_path = 1999;
+}
+
+message ImageBuffer {
+    bytes data = 1;
+}
+
+
+message ImageServiceQuery {
+    string id = 1;
+    string path = 2;
+    bytes imageBytes = 3;
+    enum ImageType {
+      PNG = 0;
+      JP2 = 2;
+      BMP = 3;
+      
+      PIXMAP = 8;
+      
+      JPG = 10;
+      JPEG = 11;
+      TIF = 13;
+      TIFF = 14;
+    }
+    
+    ImageType imageType = 4;
+    int32 width = 5;
+    int32 height = 6;
+}
+
+message TShepiiCompareRequest {
+    TShepiiResponse response1 = 1;
+    TShepiiResponse response2 = 2;
+}
+
+message ServiceReply {
+    string id = 1;
+    AciiResponse aciiResponse = 2;
+    BiqtResponse biqtResponse = 3;
+    ServiceResponseType serviceResponse = 4;
+    string imageId = 5;
+    string imagePath = 6;
+    ContrastResponse contrastResponse = 7;
+    TShepiiResponse cryptResponse = 8;
+    TShepiiResponse cryptResponse2 = 9;
+    DmipaResponse dmipaResponse = 10;
+    ContactClassifierResponse contactclassifierResponse = 11;
+}
+
+message AciiResponse {
+    HorizontalAlignment horizontal = 2;
+    VerticalAlignment vertical = 3;
+}
+
+message BiqtResponse {
+    int32 contrast = 1;
+    int32 irisDiameter = 2;
+    int32 percentVisibleIris = 3;
+    int32 quality = 4;
+    int32 imageHeight = 5;
+    int32 imageWidth = 6;
+    int32 irisCenterX = 7;
+    int32 irisCenterY = 8;
+}
+
+message ContrastResponse {
+    bytes imageBytes = 1;
+}
+
+enum HorizontalAlignment {
+    UnknownHorizontal = 0;
+    Left = 1;
+    Right = 2;
+}
+
+enum VerticalAlignment {
+    UnknownVertical = 0;
+    Up = 1;
+    Down = 2;
+}
+
+message TShepiiResponse {
+  repeated TPoint keypoints = 1;
+  repeated Crypt crypts = 2;
+  repeated int32 matchIndex = 7;
+  TCircle cropIris = 3;
+  TCircle cropPupil = 4;
+  TCircle originalIris = 5;
+  TCircle originalPupil = 6;
+  int32 inputImageWidth = 8;
+  int32 inputImageHeight = 9;
+}
+
+message TCircle {
+	TPoint center = 1;
+	double radius = 2;
+}
+
+message TPoint {
+  double x = 1;
+  double y = 2;
+  double size = 3;
+}
+
+message Crypt {
+  repeated TPoint points = 1;
+}
+
+message DmipaResponse {
+    string filename = 1;
+    bool irisDetected = 2;
+
+    string response = 3;
+    string message = 4;
+    string tmpPath = 5;
+    string detectionCode = 6;
+    string processTimeMS = 7;
+}
+
+message ContactClassifierResponse {
+    string response = 1;
+    string message = 2;
+    string tmpPath = 3;
+    string detectionCode = 4;
+    string processTimeMS = 5;
+}
+
+// May be unnecessary for now, but will assist asynchronous is wanted
+enum ServiceResponseType {
+    UnknownServiceResponse = 0;
+    AciiServiceResponse = 1;
+    BiqtServiceResponse = 2;
+    DmipaServiceResponse = 3;
+    ContrastServiceResponse = 4;
+    TShepiiServiceResponse = 5;
+    ContactClassifierServiceResponse = 6;
+}

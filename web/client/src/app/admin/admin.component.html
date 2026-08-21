@@ -1,0 +1,130 @@
+<!-- 
+    NOTICE
+ 
+    This software (or technical data) was produced for the U. S. Government 
+    and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+    (May 2014) – Alternative IV (Dec 2007)
+
+    (c) 2024 The MITRE Corporation. All Rights Reserved.
+-->
+<div class="col-md-12">
+  <div class="container">
+    <div class="w-100 d-flex">
+      <h2 matTooltip="Individuals creating the reports and using the tools. Examples could be analysts needing to perform the reviewing.">Manage Users</h2>
+      <div class="toolbar-spacer"></div>
+      <mat-form-field>
+        <input matInput placeholder="Filter" (keyup)="applyFilter($event)">
+      </mat-form-field>
+    </div>
+    <div class="mat-elevation-z8 mt-2">
+      <table mat-table [dataSource]="usersData" class="w-100" aria-describedby="Table of Current Users">
+        <ng-container matColumnDef="userName">
+          <th mat-header-cell *matHeaderCellDef scope="col">User Name</th>
+          <td mat-cell *matCellDef="let user">
+            {{user.username}}
+            <span class="badge badge-secondary" *ngIf="isLoggedInUser(user)">it's you!</span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef scope="col">Modify</th>
+          <td mat-cell *matCellDef="let user" class="btn-xs-wrap">
+            <button mat-raised-button class="mr-1" color="primary"
+                    (click)="profileEditClicked(user, addProfileModal)" matTooltip="Edit User">
+              <i class="fa fa-pencil-alt fa-1" aria-hidden="true"></i>
+            </button>
+            <button mat-raised-button color="warn"
+                    (click)="removeProfileClicked(user, removeConfirmModal)" matTooltip="Delete User"
+                    [disabled]="isLoggedInUser(user)">
+              <i aria-hidden="true" class="fa fa-trash fa-1"></i>
+            </button>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="usersColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: usersColumns"></tr>
+      </table>
+      <mat-paginator [pageSizeOptions]="[10, 25, 50]"></mat-paginator>
+    </div>
+  </div>
+</div>
+
+<div class="page-actions">
+  <button mat-raised-button color="primary" (click)="newProfileClicked(addProfileModal)">
+    <i aria-hidden="true" class="fa fa-fw fa-plus"></i> Add User
+  </button>
+</div>
+
+<!-- Modal -->
+<ng-template #addProfileModal>
+  <h4 mat-dialog-title id="addProfileModalLabel">{{ editing ? "Update" : "Create" }} User</h4>
+  <div mat-dialog-content>
+    <form #createForm="ngForm" appPasswordMatcher method="post" password1="createNewPasswordInput"
+          password2="createConfirmPasswordInput">
+      <mat-form-field class="w-100">
+        <input matInput id="createNameInput" type="text" class="form-control" name="createNameInput"
+               placeholder="Username" #createNameInput="ngModel" [(ngModel)]="userToCreateOrEdit.username" required
+               [readonly]="!newUser">
+        <mat-error *ngIf="createNameInput.invalid">Name must be unique</mat-error>
+      </mat-form-field>
+      <mat-form-field class="w-100" *ngIf="editing">
+        <input matInput type="password" placeholder="Current Password" name="currentPasswordInput"
+               #currentPasswordInput="ngModel" [(ngModel)]="currentPassword">
+        <mat-error *ngIf="currentPasswordInput.hasError('badPassword')">Incorrect password</mat-error>
+      </mat-form-field>
+      <mat-form-field class="w-100">
+        <input matInput id="createNewPasswordInput" [type]="passwordVisible ? 'text':'password'"
+               name="createNewPasswordInput" maxlength="64" minlength="8" placeholder="New Password"
+               #createNewPasswordInput="ngModel" [(ngModel)]="newPassword" [required]="newUser">
+        <span style="float:right;margin-right:20px;margin-top:-25px;position:relative;z-index:2;"
+              [class]="passwordVisible?'fa fa-eye-slash':'fa fa-eye'" (click)="showHidePassword()"></span>
+        <mat-error *ngIf="createNewPasswordInput.errors">New password must be between 8 & 64 characters.</mat-error>
+      </mat-form-field>
+      <mat-form-field class="w-100">
+        <input matInput id="createConfirmPasswordInput" [type]="passwordVisible?'text':'password'"
+               name="createConfirmPasswordInput" placeholder="Confirm Password" #createConfirmPasswordInput="ngModel"
+               [(ngModel)]="confirmNewPassword" [required]="newUser">
+        <mat-error *ngIf="createForm.hasError('passwordMismatch')">
+          Passwords do not match
+        </mat-error>
+      </mat-form-field>
+      <div class="form-group">
+        <table disabled class="table table-striped" aria-describedby="Table of Role Options for Users">
+          <tr>
+            <th scope="col">Roles</th>
+            <th scope="col">Description</th>
+          </tr>
+          <tr *ngFor="let role of userRoles">
+            <td><input type="checkbox" [checked]="userHasRole(role)" [required]="newUser" (click)="setRole(role, $event)"> {{ role.name }}
+            </td>
+            <td>{{ role.description }}</td>
+          </tr>
+        </table>
+      </div>
+    </form>
+  </div>
+  <div mat-dialog-actions class="confirm-cancel-btn-group">
+    <button mat-button (click)="closeProfile(createForm)">Cancel</button>
+    <button mat-raised-button color="primary" *ngIf="editing; else createButton" (click)="saveProfile(createForm)"
+            [disabled]="userToCreateOrEdit.username == null || currentPassword == '' || ((newPassword != '' || confirmNewPassword != '') && currentPassword == '') || 
+            this.createForm.form.invalid || (this.createForm.form.pristine && hasRoleChanged == false) || 
+            (newPassword == '' && hasRoleChanged == false)">
+      Update</button>
+    <ng-template #createButton>
+      <button mat-raised-button color="primary" (click)="saveProfile(createForm)"
+            [disabled]="userToCreateOrEdit.username == null || this.createForm.form.invalid || hasRoleChanged == false || (this.createForm.form.pristine) ||
+            (this.createForm.form.dirty && newPassword == '' && currentPassword == '') || this.userToCreateOrEdit.roles.length <= 0">
+      Create</button>
+    </ng-template>
+  </div>
+</ng-template>
+
+<!-- Delete User Confirmation Dialog -->
+<ng-template #removeConfirmModal>
+  <h3 mat-dialog-title>Delete User Account</h3>
+  <div mat-dialog-content>
+    Are you sure you'd like to delete this user?
+  </div>
+  <div mat-dialog-actions class="text-right" class="confirm-cancel-btn-group">
+    <button mat-button mat-dialog-close>Cancel</button>
+    <button mat-raised-button color="warn" (click)="removeProfile(userToCreateOrEdit)">Remove Requester</button>
+  </div>
+</ng-template>

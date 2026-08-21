@@ -1,22 +1,24 @@
-# NOTICE #
+>
+> NOTICE
+>
+> This software (or technical data) was produced for the U. S. Government and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV (May 2014) - Alternative IV (Dec 2007).
+>
+> (c) 2024 The MITRE Corporation. All Rights Reserved.
+>
 
-Only artifacts necessary for running the containerized version of the Iris Analysis Tookit stack are currently available. Code will be published soon. Please see [Quickstart for Users](#quickstart-for-users) below for running the software with `Docker`.
 
-# Iris Analysis Toolkit #
+# Iris Analysis Toolkit
 
 The Iris Analysis Toolkit (IAT), formerly known as the Iris Workstation and Iris Workstation Prototype, is a system that demonstrates the capabilities of an iris examination workstation. It was made to allow users to easily create generic Electronic Biometric Transmission Specification files as well as review and annotate iris images.
 
-## Table of Contents ##
+## Table of Contents
 
 - [Iris Analysis Toolkit](#iris-analysis-toolkit)
   - [Table of Contents](#table-of-contents)
   - [Software Versions](#software-versions)
   - [Quickstart for Users](#quickstart-for-users)
-  - [QuickStart for Developers](#quickstart-for-developers)
-    - [MacOS Installation](#macos-installation)
-    - [Start Up](#start-up)
 
-## Software Versions ##
+## Software Versions
 
 This program was built using these package managers, but may work with newer versions:
 
@@ -25,126 +27,55 @@ This program was built using these package managers, but may work with newer ver
 - Angular Package Manager: npm -v 10.8.1
 - Java SE Environment: java -v 17
 - Build Package: maven -v 3.9.6
+- JavaScript Package Manager: yarn -v 1.22.22
 
-## Quickstart for Users ##
+## Quickstart for Users
 
 This section gives steps to start the program for users who are simply looking to run the application (i.e., are not troubleshooting or developing). Since this section only runs docker containers, it doesn't run any changes made on the local environment.
 
+### Set up Environment Variables
 1. Start Up Project
-   1. **IMPORTANT!** The `docker compose` files in the `iwp-simple` directory will use credentials from a `.env` file in that directory. For security reasons, a `.env` file is not included  in this repo. To use the `docker compose` files you will need to create a `.env` file in the `iwp-simple` directory with the following contents:
-		
-		DATABASE_PASSWORD=A_STRONG_PASSWORD_OF_YOUR_CHOOSING
-		DATABASE_USERNAME=A_USERNAME_OF_YOUR_CHOOSING
-		DATABASE_ROOT_PASSWORD=ANOTHER_STRONG_PASSWORD_OF_YOUR_CHOOSING
+   **IMPORTANT!** The `docker compose` files in the `docker` directory and the `application.properties` files in the `web` directory will use credentials from a `.env` file in that directory. For security reasons, only a `.env.template` file is included with all the variables that need to be filled out. To run the application via docker or locally, please follow these steps:
+   1. Make a new file in the `docker` directory called `.env` from the `.env.template` file by running:
+      ```sh
+      cp .env.template .env
+      ```
+   2. Fill in the variables in the new `.env` file with usernames and passwords of your choosing.* The database and artemis passwords don't need an encrypted password.
+   
+See [this link](https://docs.docker.com/compose/environment-variables/set-environment-variables/#compose-file) for details about .env files 
 
-      See [this link](https://docs.docker.com/compose/environment-variables/set-environment-variables/#compose-file) for details about .env files 
-   2. In the terminal, type the following commands to start up docker containers:
+*NOTE: The User Roles need the passwords encrypted. Follow the next step to encrypt your User Role Passwords.
 
-    ```bash
-    cd iris-workstation/iwp-simple/ #Navigates into to the subdirectory that contains the docker scripts for easy running
-    ./composeScript.sh prune #Clear out old/unwanted data and unused containers, images, etc:
-    docker compose up #Runs the docker script for easy start up
+2. Encrypting User Role Passwords
+   1. If needed, download the jasypt tool here (http://www.jasypt.org/cli.html). If the ZIP download is not available, check the jasypt Github at (https://github.com/jasypt/jasypt/releases).
+   2. Use the commands below to encrypt, and if need be, decrypt passwords. Once you have the encrypted string, paste it into the `.env` file.
+      1. When encryping a hash on the commandline you need to escape the `$` characters with a `\`.
+      2. The additional options are needed because the spring jayspt uses those defaults to decrypt and it will break without them. 
+      3. Please note that if you use this exact command, you will be setting the secret key to `examplepass`. This must be the same string as the `JASYPT_ENCRYPTOR_PASSWORD` value in the `docker/.env` file.
+      4. When filling in the `docker/.env` file, make sure to surround the encrypted output with `"ENC()"`. For the example below, if the output was `123abcENCRYPTEDpass`, the variable would be set to `"ENC(123abcENCRYPTEDpass)"`
+   
+   Example of encrypting and decrypting the string "CHOSENSTRING" using the password key "examplepass":
+   ```bash
+   # Encrypt
+   ./encrypt.sh input="CHOSENSTRING" password=examplepass algorithm=PBEWITHHMACSHA512ANDAES_256 verbose=true stringOutputType=base64 providerName=SunJCE saltGeneratorClassName=org.jasypt.salt.RandomSaltGenerator ivGeneratorClassName=org.jasypt.iv.RandomIvGenerator
+
+   >> 123abcENCRYPTEDpass
+
+   # Decrypt
+   ./decrypt.sh input="CHOSENSTRING" password=examplepass algorithm=PBEWITHHMACSHA512ANDAES_256 verbose=true stringOutputType=base64 providerName=SunJCE saltGeneratorClassName=org.jasypt.salt.RandomSaltGenerator ivGeneratorClassName=org.jasypt.iv.RandomIvGenerator
+   ```
+
+### Run Application via Docker
+The following steps explain how to start the program in "user" mode. This mode is for users who want to simply start it up and run it. This will not run any changes in the local code. To see the changes in the code, please follow the [Run Application From a Script](web/README.md#from-a-script) instructions under the `web/` subdirectory.
+
+NOTE: If you are using a GPU and would like the Iris Annotation component to be able to use the GPU, you must comment out the iwp-annotation cpu's docker service and un-comment out the iwp-annotation gpu's docker service in the `iat/docker/docker-compose.yml` file.
+
+1. In the terminal, run the following commands in the `iat/docker/` subdirectory: 
+    ```sh
+    ./composeScript.sh prune # Clear out old/unwanted data and unused containers, images, etc:
+    docker compose up # Runs the docker-compose.yml script that starts up the service and user interface via docker for easy start up.
     ```
 
-2. Use Project
-   1. Open choice of web browser and navigate to `localhost:8080`
+2. In a web browser, navigate to `localhost:8080`
       1. Log in with username and password
-   2. Start generating and annotating files
 
-## QuickStart for Developers ##
-
-This section gives steps to start the program in the "editing mode". The following steps are for developers who are troubleshooting or contributing to the code. This section starts up the program to run only the services in docker containers. The backend and frontend parts are built and ran using the code from the local environment.
-
-### MacOS Installation ###
-
-Follow the steps below to get started with this project's development environment on a Mac.
-
-1. Install Xcode Command Line Tools
-   1. Open Terminal and type the following command:
-
-        ```bash
-        xcode-select --install
-        ```
-
-   2. In the new dialog windows, confirm and agree to the installation and license agreement
-2. Install Homebrew
-   1. Open Terminal and type the following command:
-
-        ```bash
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        ```
-
-   2. Type your admin password and hit Enter[^1]
-   3. Wait a few minutes until you see a "Installation successcul" message
-    [^1]: You won't see your keystrokes in the terminal
-3. Install Packages
-    - Open Terminal and type the following commands to install the packages:
-
-    ```bash
-    brew install angular-cli #Angular Cli
-    brew install node@20.15.0 #Node
-    brew install maven #Maven
-    ```
-
-### Start Up ###
-
-1. Clone Project
-2. Start Up Project:
-   1. In the terminal, type the following commands to start up the docker containers:
-
-        ```bash
-        cd iris-workstation/iwp-simple/ #Navigates into to the subdirectory that contains the docker scripts for easy running
-        ./composeScript.sh prune #Clear out old/unwanted data and unused containers, images, etc.
-        docker compose -f docker-compose.local.yml up #Runs a docker script that only starts up the services from docker containers
-        ```
-
-   2. Open a second terminal window and type the following commands to start up the backend:
-
-		**After this step you can access the application at [http://localhost:8080](http://localhost:8080).**
-
-        ```bash
-        cd iris-workstation/ #Navigates to the project's home directory
-        UNIX: export JASYPT_ENCRYPTOR_PASSWORD="examplepass"
-        Windows: $Env:JASYPT_ENCRYPTOR_PASSWORD ="examplepass"
-        ./iwp-script.sh full #Runs the local backend services, including any changes just made
-        ```
-
-   3. **(Optional)** Open a third terminal window and type the following commands to start up the frontend:
-
-		**You only need this step if you want access to a front end that automatically refreshes when changes are made.**
-		
-		After this step you can access the front end development server at [http://localhost:4200](http://localhost:4200).
-
-		**Special note about the front end development server:** Due to some Spring Security and webpack-dev-server proxy complexities, the login page does not work through the development server. You likely will see strange and broken behavior on the front end development server. There are two workarounds for this:
-
-		- Disable the login page while doing front end development by setting `iwp.security.secured=false` in the `application.properties` file.
-
-		- Go to the front end hosted by the Java backend [http://localhost:8080](http://localhost:8080) and login there. Requests through the front end development server [http://localhost:4200](http://localhost:4200) should then be authenticated. 
-
-        ```bash
-        cd iris-workstation/client/ #Navigates to the project's front end subdirectory
-        yarn run local #Runs the local frontend services, including any changes just made
-        ```
-
-   4. **(Optional)** Open a fourth terminal window and type the following commands to start up the database management container:
-
-		**You only need this step if you want to access the database for debugging purposes.**
-
-        ```bash
-        cd iris-workstation/ #Navigates to the project's home directory
-        docker run --name iwp_php_admin --network iwp-simple_default -v phpmyadmin-volume:/etc/phpmyadmin/config.user.inc.php --link iwp_mysql:db -p 82:80 -d phpmyadmin/phpmyadmin #Runs the database container
-
-3. Use Project
-    1. Open choice of web browser and navigate to `localhost:4200`
-       1. Log in with username and password
-    2. To see the database, open choice of web browser and navigate to `localhost:82`
-       1. Log in with username and password
-    
-
-## NOTICE
-
-#### Approved for Public Release; Distribution Unlimited. Public Release Case Number 23-1989
-
-#### This software (or technical data) was produced for the U. S. Government and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV (May 2014) – Alternative IV (Dec 2007)
-
-#### (c) 2024 The MITRE Corporation. All Rights Reserved.

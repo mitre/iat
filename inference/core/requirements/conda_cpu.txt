@@ -1,0 +1,18 @@
+#
+# NOTICE
+# 
+# This software (or technical data) was produced for the U. S. Government 
+# and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+# (May 2014) – Alternative IV (Dec 2007)
+# 
+# (c) 2024 The MITRE Corporation. All Rights Reserved.
+# 
+
+docopt==0.6.2
+glib==2.78.4
+intel-openmp=2023.1.0
+mkl=2023.1.0
+pytorch=2.2.2=py3.12_cpu_0
+pytorch-mutex=1.0=cpu
+stomp.py==8.0.1
+torchvision=0.17.2=py312_cpu
