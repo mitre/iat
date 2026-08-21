@@ -41,12 +41,20 @@ Use the provided build script to build every IAT component from a clean source c
 - Internet access to clone public dependencies and download Maven, Python, PDM-model, and container-image dependencies.
 - Enough disk space for Maven caches, model files, and Docker build layers.
 
+If your network uses a TLS-inspecting proxy, provide its PEM root certificate with `IAT_CA_FILE`. The script passes the certificate to image builds as a BuildKit secret so the affected build stages can add it to their trust stores.
+
 ### Build
 
 From the repository root, run:
 
 ```sh
 ./scripts/build-all.sh
+```
+
+For a TLS-inspecting network, run:
+
+```sh
+IAT_CA_FILE=/path/to/organization-root-ca.pem ./scripts/build-all.sh
 ```
 
 The script clones the public dependencies into a sibling `iat-dependencies/` directory by default. Set `IAT_DEPENDENCY_ROOT` to use another location. It tags the local images with the same names and versions used by `docker/docker-compose.yml`, so Docker Compose uses the images you just built. The default target platform is `linux/amd64`, matching the Compose configuration.

@@ -14,6 +14,7 @@ set -euo pipefail
 IAT_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 DEPENDENCY_ROOT=${IAT_DEPENDENCY_ROOT:-"$IAT_ROOT/../iat-dependencies"}
 PLATFORM=${IAT_PLATFORM:-linux/amd64}
+CA_FILE=${IAT_CA_FILE:-}
 
 WEB_IMAGE=${IAT_WEB_IMAGE:-ghcr.io/mitre/iat/iwp-web:26.07}
 ACII_IMAGE=${IAT_ACII_IMAGE:-ghcr.io/mitre/iat/iwp-acii:26.08}
@@ -42,8 +43,19 @@ build_image() {
   local image=$1
   local dockerfile=$2
   local context=$3
+  local -a build_args
 
-  DOCKER_BUILDKIT=1 docker build --platform "$PLATFORM" -t "$image" -f "$dockerfile" "$context"
+  build_args=(--platform "$PLATFORM" -t "$image" -f "$dockerfile")
+
+  if [ -n "$CA_FILE" ]; then
+    if [ ! -f "$CA_FILE" ]; then
+      echo "IAT_CA_FILE does not identify a readable certificate file: $CA_FILE" >&2
+      exit 1
+    fi
+    build_args+=(--secret "id=ca_file,src=$CA_FILE")
+  fi
+
+  DOCKER_BUILDKIT=1 docker build "${build_args[@]}" "$context"
 }
 
 require_command docker

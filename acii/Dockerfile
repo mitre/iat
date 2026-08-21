@@ -17,7 +17,7 @@ WORKDIR /acii/install
 # Building on some infrastructure requires the installation of a certificate authority. This is OPTIONAL
 # for external systems and will only be installed when the ca_file secret is provided in the build command.
 RUN --mount=type=secret,id=ca_file,required=false \
-    if [[ -f /run/secrets/ca_file ]]; then \
+    if [ -f /run/secrets/ca_file ]; then \
        cat /run/secrets/ca_file >> /etc/ssl/certs/ca-certificates.crt; \
     fi
     
