@@ -16,6 +16,7 @@ The Iris Analysis Toolkit (IAT), formerly known as the Iris Workstation and Iris
 - [Iris Analysis Toolkit](#iris-analysis-toolkit)
   - [Table of Contents](#table-of-contents)
   - [Software Versions](#software-versions)
+  - [Build Everything from Source](#build-everything-from-source)
   - [Quickstart for Users](#quickstart-for-users)
 
 ## Software Versions
@@ -28,6 +29,36 @@ This project was built with the following tools and may work with newer versions
 - Java SE environment: Java 17
 - Build tool: Maven 3.9.6
 - JavaScript package manager: Yarn 1.22.22
+
+## Build Everything from Source
+
+Use the provided build script to build every IAT component from a clean source checkout. The script builds the public JET and BIQT dependencies, packages the Maven modules, downloads the PDM models, and builds local CPU Docker images for ACII, BIQT, Iris Annotation, TSHEPII, PDM, and the Web component.
+
+### Prerequisites
+
+- Docker with BuildKit enabled. Docker Desktop users should enable Linux/AMD64 emulation when building on Apple Silicon.
+- Git, Java 17, Maven, and Bash.
+- Internet access to clone public dependencies and download Maven, Python, PDM-model, and container-image dependencies.
+- Enough disk space for Maven caches, model files, and Docker build layers.
+
+### Build
+
+From the repository root, run:
+
+```sh
+./scripts/build-all.sh
+```
+
+The script clones the public dependencies into a sibling `iat-dependencies/` directory by default. Set `IAT_DEPENDENCY_ROOT` to use another location. It tags the local images with the same names and versions used by `docker/docker-compose.yml`, so Docker Compose uses the images you just built. The default target platform is `linux/amd64`, matching the Compose configuration.
+
+The script builds the CPU Iris Annotation image. To build the GPU variant instead, run the equivalent command after the script completes:
+
+```sh
+docker build -t ghcr.io/mitre/iat/iwp-annotation-gpu:26.07 \
+  -f inference/core/Dockerfile-GPU inference/core
+```
+
+After the build completes, create `docker/.env` from `docker/.env.template`, provide strong non-empty credentials, and start the local images with `docker compose up` from `docker/`.
 
 ## Quickstart for Users
 
