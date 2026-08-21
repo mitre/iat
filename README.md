@@ -66,7 +66,7 @@ docker build -t ghcr.io/mitre/iat/iwp-annotation-gpu:26.08 \
   -f inference/core/Dockerfile-GPU inference/core
 ```
 
-After the build completes, create `docker/.env` from `docker/.env.template`, provide strong non-empty credentials, and start the local images with `docker compose up` from `docker/`.
+After the build completes, create `docker/.env` from `docker/.env.template`, provide strong non-empty credentials and a database name, and start the local images with `docker compose up` from `docker/`.
 
 ## Quickstart for Users
 

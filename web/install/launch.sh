@@ -8,5 +8,5 @@
 # (c) 2024 The MITRE Corporation. All Rights Reserved.
 # 
 
-echo "Hello :)"
-java -jar $(ls *.jar | head -n1)
+exec java -jar "$(ls *.jar | head -n1)" \
+  --spring.config.additional-location=optional:file:/app/config/
