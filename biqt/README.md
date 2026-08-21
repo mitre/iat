@@ -9,19 +9,20 @@
 
 # BIQT Component
 
-The BIQT component is an Iris Analysis Toolkit (IAT) service that analyzes an iris image and returns it's quality score and whether or not there are contacts present.
+The BIQT component is an Iris Analysis Toolkit (IAT) service that analyzes an iris image and returns its quality score and whether contact lenses are present.
 
-## Starting the Service:
-This service can only be started through docker and ran with the IAT inferface. To start the service that way, please follow the [Quickstart for Users](../README.md#quickstart-for-users) instructions.
+## Starting the Service
 
-If you make changes to the scripts and would like to create a new docker image, please jump to [Rebuild Docker Image](#rebuild-docker-image).
+This service can be started only with Docker through the IAT interface. Follow the [Quickstart for Users](../README.md#quickstart-for-users) instructions.
+
+If you make changes to the scripts and want to create a new Docker image, see [Rebuild Docker Image](#rebuild-docker-image).
 
 ## Rebuild Docker Image
 ### Prerequisites
 ##### Package Installation
-To build this docker image, there are a few prerequisites.
-1. Get Homebrew set up by following the [Environment Set Up](#../web/README.md#environment-set-up) instructions. If Homebrew is already installed, skip this step.
-2. Open Terminal and run the following command to install the maven package:
+To build this Docker image, complete the following prerequisites.
+1. Install Homebrew by following the [environment setup instructions](../web/README.md#environment-set-up), if it is not already installed.
+2. Run the following command to install Maven:
     ```sh
     brew install maven
     ```
@@ -39,7 +40,7 @@ To build this docker image, there are a few prerequisites.
     ```
 
 ### Building Docker Image
-If a new docker image is needed to be built, run the following command from the `iat/biqt/` subdirectory:
+To build a new Docker image, run the following command from the `iat/biqt/` subdirectory:
   ```sh
   # The '--platform linux/amd64' is for building on Apple Silicon Systems
   docker build --platform linux/amd64 \

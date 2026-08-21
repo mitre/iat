@@ -9,15 +9,15 @@
 
 # TSHEPII Component
 
-The TSHEPII component is an Iris Analysis Toolkit (IAT) service that analyzes an iris image and returns the detected crypts and unrolled the location for the iris. For more information about the TSHEPII's original tool, please see the [Original TSHEPII README](doc/README.md#tshepii).
+The TSHEPII component is an Iris Analysis Toolkit (IAT) service that analyzes an iris image and returns detected crypts and an unrolled iris location. For more information about the original TSHEPII tool, see the [Original TSHEPII README](doc/README.md#tshepii).
 
 ## Starting the Service
-This service can be started through docker and ran with the IAT interface. To start the service that way, please follow the [Quickstart for Users](../README.md#quickstart-for-users) instructions. 
+This service can be started with Docker through the IAT interface. Follow the [Quickstart for Users](../README.md#quickstart-for-users) instructions.
 
-If you make changes to the scripts and would like to create a new docker image, please jump to [Rebuild Docker Image](#rebuild-docker-image).
+If you make changes to the scripts and want to create a new Docker image, see [Rebuild Docker Image](#rebuild-docker-image).
 
 ## Rebuild Docker Image
-If a new docker image is needed to be built, run this command from the main `iat/` project directory:
+To build a new Docker image, run this command from the main `iat/` project directory:
   ```sh
   DOCKER_BUILDKIT=1 docker build --platform linux/amd64 \
   -t new_tshepii_image:YOUR_TAG_HERE \

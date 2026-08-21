@@ -132,9 +132,8 @@ public class IrisSearchController {
         return ResponseEntity.ok().body(returnList);
     }
 
-    // creates an ebts search message from a previously created
-    // 'CreateIrisSearchRequest"
-    // used on the history page to create the ebts search message
+    // Creates an EBTS search message from a previously created
+    // CreateIrisSearchRequest. Used on the history page.
     @Secured({ "ROLE_CASE_WORKER", "ROLE_CASE_SUPERVISOR" })
     @GetMapping(value = "/api/iris/search/download/{id}")
     public ResponseEntity<?> downloadIrisSearchMessage(@PathVariable(value = "id") long id, Principal principal) {
@@ -178,12 +177,12 @@ public class IrisSearchController {
 
 				Set<String> collectedAnnotations = new HashSet<>();
 
-				//Gather all annotations IDs together into a set
+				// Gather all annotation IDs into a set.
 				for (Annotation a : annotations) {
 					reportDataService.collectAnnotationIds(collectedAnnotations, a);
 				}
 
-				//Go through the annotations and remove the annotation values from the variable and then delete them from the DB
+				// Remove annotation values from the variable, then delete them from the database.
 				for (String annID : collectedAnnotations) {
 					if(this.annotationRepository.existsById(annID)){
 
@@ -202,7 +201,7 @@ public class IrisSearchController {
 					}
 				}
 
-				//Dereference all annotations from the list and remove from the DB
+				// Dereference all annotations from the list and remove them from the database.
 				for (Iterator<Annotation> iterator = annotations.iterator(); iterator.hasNext(); ) {
 					
 					Annotation currAnnotation = iterator.next();

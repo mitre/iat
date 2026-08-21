@@ -5,23 +5,25 @@
 >
 > (c) 2024 The MITRE Corporation. All Rights Reserved.
 >
-Need to add new Image.png under resources
+# Pupil Dilation Mode Component
 
-# Pupil Dialation Mode Component
-Pupil Dialation Mode (PDM) component is a service for the Iris Analysis Toolkit (IAT) that enables the user to change the ratio of the pupil to iris by dilating pupil.
+The Pupil Dilation Mode (PDM) component is an Iris Analysis Toolkit (IAT) service that changes the pupil-to-iris ratio by dilating the pupil.
 
 ## Starting the Service
-This service can be ran two ways:
+This service can be started in two ways:
 1. (Recommended) [Docker Image via the IAT](#docker-and-iat)
 2. [From a Script](#from-a-script)
 
-If you make changes to the scripts or the models and would like to create a new docker image, please jump to [Rebuild Docker Image](#rebuild-docker-image).
+If you make changes to the scripts or models and want to create a new Docker image, see [Rebuild Docker Image](#rebuild-docker-image).
 
 ### Docker and IAT
 This is the recommended way.
 To start the service through docker and run it with the IAT interface, please follow the [Quickstart for Users](../README.md#quickstart-for-users) instructions. 
 
 ### From a Script
+
+#### Prerequisites
+
 - An ActiveMQ Artemis-compatible broker reachable over STOMP.
 <a id="download-models"></a>
 - The PDM model files in `models/`. To obtain these models, run the following command:
@@ -59,23 +61,23 @@ python3 Comparison_GUI.py
 
 To run with a CUDA-capable GPU, append `--cuda` to the final command.
 
-The service is now runnign and will continue to run while it waits for messages from `iris.pdm.request` and
+The service is now running and waits for messages from `iris.pdm.request` and
 `iris.dual.pdm.request`, then produces responses on `iris.pdm.response` and
 `iris.dual.pdm.response`. Press `Ctrl-C` to stop the service.
 
 *NOTE: This option is not recommended since a client must publish an `ImageServiceQuery` message to ActiveMQ on `iris.pdm.request` and consume the resulting `DeformerWrapper` message from `iris.pdm.response`. For dual-image processing, the client must publish and consume `DualPDMComparison` messages on `iris.dual.pdm.request` and `iris.dual.pdm.response`, respectively. A complete client script is not currently provided.
 
 ## Rebuild Docker Image
-*Before building the docker image, the models must be downloaded.* Follow the [download the models](#download-models) instructions.
-If a new docker image is needed to be built, run this command from the `pdm/` subdirectory:
+*Before building the Docker image, download the models.* Follow the [model-download](#download-models) instructions.
+To build a new Docker image, run this command from the `pdm/` subdirectory:
   ```sh
   docker build --platform linux/amd64 -t new_pdm_image:YOUR_TAG_HERE \
   -f Dockerfile .
   ```
 
 ## Run Smoke Tests
-Included in this project is a `test.py` script that contains 2 smoke tests which sends images to the single PDM and dual PDM service. Before running those tests, you must:
-1. Set the STOMP_HOST variable section in your new `.env` file from the [From a Script: Prerequisites](#prerequisites)
-2. Ensure that at least the activeMQ and PDM services are running.
+This project includes a `test.py` script with two smoke tests that send images to the single- and dual-PDM services. Before running the tests, you must:
+1. Set the `STOMP_HOST` variable in the `.env` file described in [Prerequisites](#from-a-script).
+2. Ensure that the ActiveMQ and PDM services are running.
     - You can start the containers by running `docker compose up` in the `../docker/` directory.
 3. **OPTIONAL** You might want to replace the `Image.png` file under the `resources/` directory. Just ensure that you keep the name the same or change the name in the `test.py` file. There are 3 locations that would need to be changed in that file. NOTE: The image must be in PNG format.

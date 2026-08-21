@@ -54,20 +54,20 @@ startService() {
 		exit 1
 	fi
 
-	#Jasypt expects the environment variable JASYPT_ENCRYPTOR_PASSWORD to contain the decryption password
-	#We could pass in the password on the commandline but then it is visable in tools like top
-	#If you want it to run without asking for your password or needing to pass it in as an argument set the environment variable:
-	#export JASYPT_ENCRYPTOR_PASSWORD="yourpass"
+	# Jasypt expects JASYPT_ENCRYPTOR_PASSWORD to contain the decryption password.
+	# Passing the password on the command line can expose it to process-listing tools.
+	# To run without a prompt or command-line password, set this environment variable:
+	# export JASYPT_ENCRYPTOR_PASSWORD="yourpass"
 
-	#If JASYPT_ENCRYPTOR_PASSWORD is passed in as an argument then use that first
+	# Use JASYPT_ENCRYPTOR_PASSWORD from the argument when it is provided.
 	if [[ -n "$1" ]]; then
-		echo "Using JASYPT_ENCRYPTOR_PASSWORD passed in from commandline"
+			echo "Using JASYPT_ENCRYPTOR_PASSWORD passed from the command line"
 		export JASYPT_ENCRYPTOR_PASSWORD=$1
 
-	#If JASYPT_ENCRYPTOR_PASSWORD is set as environment variable use it
+	# Otherwise, use JASYPT_ENCRYPTOR_PASSWORD from the environment when it is set.
 	elif [[ -n "$JASYPT_ENCRYPTOR_PASSWORD" ]]; then
 		echo "Using JASYPT_ENCRYPTOR_PASSWORD from environment variable"
-	#If JASYPT_ENCRYPTOR_PASSWORD is not set and not provided, prompt for it
+	# If JASYPT_ENCRYPTOR_PASSWORD is not set or provided, prompt for it.
 	else
 		echo "Enter jasypt encryption password: "
 		read -s JASYPT_ENCRYPTOR_PASSWORD

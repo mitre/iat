@@ -8,11 +8,11 @@
 # (c) 2024 The MITRE Corporation. All Rights Reserved.
 #
 
-#IMPORTANT!
-#To deploy this compose file, set the following environment variables in a .env file. 
+# Important
+# To deploy this Compose file, set the following environment variables in a `.env` file:
 #DATABASE_PASSWORD, DATABASE_USERNAME, DATABASE_ROOT_PASSWORD, DATABASE_NAME
-#See the below docs link for details about .env files
-#https://docs.docker.com/compose/environment-variables/set-environment-variables/#compose-file
+# See the following Docker documentation for details about `.env` files:
+# https://docs.docker.com/compose/environment-variables/set-environment-variables/#compose-file
 
 services:
   activemq:
@@ -149,9 +149,9 @@ services:
     restart: always
     environment:
       MYSQL_DATABASE: ${DATABASE_NAME}
-      # So you don't have to use root, but you can if you like
+      # Allows database access without using the root account.
       MYSQL_USER: ${DATABASE_USERNAME}
-      # You can use whatever password you like
+      # Password for the non-root database account.
       MYSQL_PASSWORD: ${DATABASE_PASSWORD}
       # Password for root access
       MYSQL_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
@@ -162,12 +162,12 @@ services:
       timeout: 1s
       retries: 50
     ports:
-      # <Port exposed> : < MySQL Port running inside container>
+      # <Exposed port>: <MySQL port running inside the container>
       - '3306:3306'
     expose:
-      # Opens port 3306 on the container
+      # Exposes port 3306 within the Docker network.
       - '3306'
-    # Where our data will be persisted
+    # Persists database data.
     volumes:
       - my-db:/var/lib/mysql
     security_opt:

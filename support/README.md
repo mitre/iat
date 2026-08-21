@@ -16,8 +16,9 @@ This module is not a standalone service and does not require Docker or ActiveMQ 
 ### Prerequisites
 - Java 17.
 - Maven.
-- The IAT JET dependency installed in the local Maven repository. From the main `iat/` directory, build it with:
+- The IAT JET dependency installed in the local Maven repository. From the main `iat/` directory, clone and build it with:
   ```sh
+  git clone https://github.com/ebts/jet.git jet
   cd jet/Jet
   mvn install
   cd ../..

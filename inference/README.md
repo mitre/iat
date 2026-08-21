@@ -7,23 +7,23 @@
 >
 
 # Annotation Component
-Iris Annotation component is a service for the Iris Analysis Toolkit (IAT) that provides automated labeling for image segments.
+The Iris Annotation component is a service for the Iris Analysis Toolkit (IAT) that provides automated labeling for image segments.
 
 ## Starting the Service
-This service can be ran two ways: 
+This service can be started in two ways:
 1. (Recommended) [Docker Image via the IAT](#docker-and-iat)
 2. [From a Script](#from-a-script)
 
-If you make changes to the scripts and would like to create a new docker image, please jump to [Rebuild Docker Image](#rebuild-docker-image).
+If you make changes to the scripts and want to create a new Docker image, see [Rebuild Docker Image](#rebuild-docker-image).
 
 ### Docker and IAT
 This is the recommended way.
-To start the service through docker and run it with the IAT interface, please follow the [Quickstart for Users](../README.md#quickstart-for-users) instructions. 
+To start the service with Docker through the IAT interface, follow the [Quickstart for Users](../README.md#quickstart-for-users) instructions.
 
 ### From a Script
 #### Prerequisites
 - A Linux environment with Python 3.12 and the CPU or GPU Python dependencies installed. The pinned dependency lists are in `core/requirements/`.
-- The Iris Annotation application files installed in `/usr/share/iris-annotation/`, including `mq-main.py`, `main.py`, the`segment/` directory, and the generated `*_pb2.py` files.
+- The Iris Annotation application files installed in `/usr/share/iris-annotation/`, including `mq-main.py`, `main.py`, the `segment/` directory, and the generated `*_pb2.py` files.
 - Model checkpoint files installed in `/usr/share/models`. The supplied `6248.pth` checkpoint is expected in this directory.
 - A writable `/mnt/host/tmp` directory. The service temporarily stores image data received in requests there.
 - An ActiveMQ Artemis-compatible broker reachable over STOMP. By default, the service connects to `localhost:61613`.
@@ -48,7 +48,7 @@ The service consumes protobuf `ImageServiceQuery` messages from `iris.annotation
 *NOTE: This option is not recommended since a client must publish an `ImageServiceQuery` message to ActiveMQ on `iris.annotation.request` and consume the resulting `IrisAnnotationReply` message from `iris.annotation.response`. A client script is not currently provided.
 
 ## Rebuild Docker Image
-This service can utilize a CPU or a GPU, by an ENV variable USE_CUDA that is set in the Dockerfile. There are two Dockerfiles, one for CPU and one for GPU, which installs different versions packages depending on their mode. **DO NOT CHANGE THE 'USE_CUDA' VARIABLE IN THOSE FILES.** To build a new docker image, run the following command from the `inference/` subdirectory, please note if you are building on an Apple Silicon Mac:
+This service can use a CPU or GPU, based on the `USE_CUDA` environment variable set in the Dockerfile. The CPU and GPU Dockerfiles install different dependency versions. **Do not change `USE_CUDA` in these files.** To build a new Docker image from the `inference/` subdirectory, use the applicable command below. Apple Silicon users should retain the `--platform linux/amd64` option for the CPU build.
   CPU Version:
   ```sh
   cd core

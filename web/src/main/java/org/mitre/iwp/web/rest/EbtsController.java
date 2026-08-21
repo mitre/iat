@@ -226,9 +226,9 @@ public class EbtsController {
         // Read the multipart file into a BufferedImage
         BufferedImage img = ImageIO.read(mpFile.getInputStream());
 
-        // Check if image is loaded fine
+            // Check whether the image loaded successfully.
         if (img != null) {
-            // Get and gheck the type of the image data
+            // Get and check the image-data type.
             // If the image is 16-bit unsigned (ushort)
             int type = img.getType();
             if (type == BufferedImage.TYPE_USHORT_GRAY) {
