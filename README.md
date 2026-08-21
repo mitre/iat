@@ -70,6 +70,8 @@ The following steps start the application in user mode. This mode runs published
 
 *Note: To use a GPU for the Iris Annotation component, comment out the CPU `iwp-annotation` Docker service and uncomment the GPU service in `iat/docker/docker-compose.yml`.*
 
+The default Compose deployment exposes only the web application. ActiveMQ Artemis and MySQL remain on the internal Docker network. Use `docker-compose.local.yml` for local development; its broker and database ports bind only to `127.0.0.1`.
+
 1. In a terminal, run the following commands in the `iat/docker/` subdirectory:
     ```sh
     ./composeScript.sh prune # Removes unused containers, images, and other data.

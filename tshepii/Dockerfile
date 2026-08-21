@@ -68,6 +68,7 @@ RUN mkdir -p /tshepii/build \
  && make -j"$(nproc)" \
  && install -m 0755 tshepii /usr/local/bin/tshepii \
  && mkdir -p /etc/tshepii \
- && cp -a /tshepii/config/* /etc/tshepii/
+ && cp -a /tshepii/config/* /etc/tshepii/ \
+ && install -m 0755 /tshepii/start-tshepii.sh /usr/local/bin/start-tshepii
 
-CMD tshepii "${TSHEPII_CONFIG_FILE}" "${LOG4CXX_CONFIGURATION}"
+CMD ["/usr/local/bin/start-tshepii"]

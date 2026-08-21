@@ -23,3 +23,5 @@ To build a new Docker image, run this command from the main `iat/` project direc
   -t new_tshepii_image:YOUR_TAG_HERE \
   -f tshepii/Dockerfile .
   ```
+
+When running the image outside Docker Compose, provide non-empty `ARTEMIS_USER` and `ARTEMIS_PASSWORD` environment variables. The image does not provide default broker credentials.

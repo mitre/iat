@@ -19,15 +19,11 @@ services:
     image: dhi.io/activemq-artemis:2
     container_name: activemq
     restart: always
-    ports:
-      - 8161:8161
-      - 61616:61616
-      - 61613:61613
     environment:
       ARTEMIS_USER: ${ARTEMIS_USER}
       ARTEMIS_PASSWORD: ${ARTEMIS_PASSWORD}
-      ANONYMOUS_LOGIN: true
-      EXTRA_ARGS: --http-host 0.0.0.0 --relax-jolokia
+      ANONYMOUS_LOGIN: false
+      EXTRA_ARGS: --http-host 0.0.0.0
 
   web:
     image: ghcr.io/mitre/iat/iwp-web:26.07
@@ -155,23 +151,17 @@ services:
       MYSQL_PASSWORD: ${DATABASE_PASSWORD}
       # Password for root access
       MYSQL_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
-      MYSQL_ROOT_HOST: '%'
     healthcheck:
       test: mysqladmin ping -h localhost -u $$DATABASE_USERNAME --password=$$DATABASE_PASSWORD
       interval: 1s
       timeout: 1s
       retries: 50
-    ports:
-      # <Exposed port>: <MySQL port running inside the container>
-      - '3306:3306'
     expose:
       # Exposes port 3306 within the Docker network.
       - '3306'
     # Persists database data.
     volumes:
       - my-db:/var/lib/mysql
-    security_opt:
-      - seccomp:unconfined
     env_file: .env
 
 volumes:
