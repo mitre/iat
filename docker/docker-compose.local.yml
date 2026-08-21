@@ -30,7 +30,7 @@ services:
       EXTRA_ARGS: --http-host 0.0.0.0
 
   # web:
-  #   image: ghcr.io/mitre/iat/iwp-web:26.07
+  #   image: ghcr.io/mitre/iat/iwp-web:26.08
   #   restart: always
   #   depends_on:
   #     mysql:
@@ -81,7 +81,7 @@ services:
 
   # Iris Annotation via CPU 
   iwp-annotation:
-    image: ghcr.io/mitre/iat/iwp-annotation-cpu:26.07
+    image: ghcr.io/mitre/iat/iwp-annotation-cpu:26.08
     container_name: annotation
     restart: always
     depends_on:
@@ -95,7 +95,7 @@ services:
 
   # Iris Annotation via GPU 
   # iwp-annotation:
-  #   image: ghcr.io/mitre/iat/iwp-annotation-gpu:26.07
+  #   image: ghcr.io/mitre/iat/iwp-annotation-gpu:26.08
   #   container_name: annotation
   #   restart: always
   #   depends_on:
@@ -115,7 +115,7 @@ services:
   #             capabilities: [gpu]
 
   iwp-tshepii:
-    image: ghcr.io/mitre/iat/iwp-tshepii:26.07
+    image: ghcr.io/mitre/iat/iwp-tshepii:26.08
     container_name: tshepii
     restart: always
     depends_on:
