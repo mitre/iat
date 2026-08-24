@@ -83,26 +83,33 @@ This section explains how to start the application for users who only need to ru
    
 See the [Docker documentation](https://docs.docker.com/compose/environment-variables/set-environment-variables/#compose-file) for details about `.env` files.
 
-*Note: User-role passwords must be encrypted. Follow the next step to encrypt them.*
+*Note: User-role passwords must be BCrypt hashes encrypted with Jasypt. Follow the next step to prepare them.*
 
-2. Encrypt user-role passwords.
-   1. If needed, download the [Jasypt command-line tool](http://www.jasypt.org/cli.html). If the ZIP download is unavailable, see the [Jasypt releases](https://github.com/jasypt/jasypt/releases).
-   2. Use the commands below to encrypt or decrypt passwords. Paste the encrypted string into the `.env` file.
-      1. When encrypting a hash on the command line, escape `$` characters with `\`.
-      2. The additional options are required because Spring Jasypt uses these defaults for decryption.
-      3. Please note that if you use this exact command, you will be setting the secret key to `examplepass`. This must be the same string as the `JASYPT_ENCRYPTOR_PASSWORD` value in the `docker/.env` file.
-      4. When filling in the `docker/.env` file, make sure to surround the encrypted output with `"ENC()"`. For the example below, if the output was `123abcENCRYPTEDpass`, the variable would be set to `"ENC(123abcENCRYPTEDpass)"`
-   
-   The following example encrypts `CHOSENSTRING` with the password `examplepass` and then decrypts the resulting value:
-   ```bash
-   # Encrypt
-   ./encrypt.sh input="CHOSENSTRING" password=examplepass algorithm=PBEWITHHMACSHA512ANDAES_256 verbose=true stringOutputType=base64 providerName=SunJCE saltGeneratorClassName=org.jasypt.salt.RandomSaltGenerator ivGeneratorClassName=org.jasypt.iv.RandomIvGenerator
+2. Prepare user-role passwords.
+   1. Create a BCrypt hash of the password. The following command uses a temporary Docker container and prints only the hash. Replace `YOUR_PASSWORD` with the password to use:
+      ```sh
+      bcrypt_hash="$(docker run --rm httpd:2.4-alpine \
+        htpasswd -bnBC 12 '' 'YOUR_PASSWORD' | cut -d: -f2)"
+      printf '%s\n' "$bcrypt_hash"
+      ```
+   2. Download and unpack the [Jasypt command-line tool](http://www.jasypt.org/cli.html). If the ZIP download is unavailable, see the [Jasypt releases](https://github.com/jasypt/jasypt/releases). From the unpacked Jasypt directory, encrypt the BCrypt hash with the value assigned to `JASYPT_ENCRYPTOR_PASSWORD` in `docker/.env`:
+      ```sh
+      ./bin/encrypt.sh input="$bcrypt_hash" password="$JASYPT_ENCRYPTOR_PASSWORD" algorithm=PBEWITHHMACSHA512ANDAES_256 verbose=true stringOutputType=base64 providerName=SunJCE saltGeneratorClassName=org.jasypt.salt.RandomSaltGenerator ivGeneratorClassName=org.jasypt.iv.RandomIvGenerator
+      ```
+      Quoting `"$bcrypt_hash"` preserves the `$` characters in the BCrypt value.
+   3. Set the appropriate password variable in `docker/.env` to the encrypted output, wrapped in `ENC(...)`. For example:
+      ```dotenv
+      DEFAULT_USER_PASSWORD=ENC(123abcENCRYPTEDpass)
+      ```
+      Repeat these steps for `DEFAULT_REVIEWER_PASSWORD` and `DEFAULT_SUPERVISOR_PASSWORD`.
 
-   >> 123abcENCRYPTEDpass
-
-   # Decrypt
-   ./decrypt.sh input="123abcENCRYPTEDpass" password=examplepass algorithm=PBEWITHHMACSHA512ANDAES_256 verbose=true stringOutputType=base64 providerName=SunJCE saltGeneratorClassName=org.jasypt.salt.RandomSaltGenerator ivGeneratorClassName=org.jasypt.iv.RandomIvGenerator
+   Default users are created only when the application initializes an empty database. If containers have already initialized the database with incorrect passwords, changing `.env` does not update those accounts. For a disposable local installation, recreate the database before starting the application:
+   ```sh
+   docker compose down
+   docker system prune -f
+   docker compose up
    ```
+   This permanently deletes the local IAT database volume and its data.
 
 ### Run Application via Docker
 The following steps start the application in user mode. This mode runs published containers and does not include local source-code changes. To run local changes, follow the [Run Application From a Script](web/README.md#from-a-script) instructions in the `web/` subdirectory.
