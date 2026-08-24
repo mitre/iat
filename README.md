@@ -79,7 +79,7 @@ This section explains how to start the application for users who only need to ru
       ```sh
       cp .env.template .env
       ```
-   2. Set the variables in the new `.env` file to usernames and passwords of your choosing.* The database and Artemis passwords do not need to be encrypted.
+   2. Set the variables in the new `.env` file to usernames and passwords of your choosing. The database and Artemis passwords do not need to be encrypted.
    
 See the [Docker documentation](https://docs.docker.com/compose/environment-variables/set-environment-variables/#compose-file) for details about `.env` files.
 
@@ -106,7 +106,7 @@ See the [Docker documentation](https://docs.docker.com/compose/environment-varia
    Default users are created only when the application initializes an empty database. If containers have already initialized the database with incorrect passwords, changing `.env` does not update those accounts. For a disposable local installation, recreate the database before starting the application:
    ```sh
    docker compose down
-   docker system prune -f
+   docker volume rm docker_my-db
    docker compose up
    ```
    This permanently deletes the local IAT database volume and its data.
