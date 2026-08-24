@@ -1,0 +1,89 @@
+/* 
+* NOTICE
+*  
+* This software (or technical data) was produced for the U. S. Government
+* and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV
+* (May 2014) – Alternative IV (Dec 2007)
+* 
+* (c) 2024 The MITRE Corporation. All Rights Reserved.
+*/ 
+
+.dialog-header {
+  display: flex;
+  width: 100%;
+}
+
+.horizontal-fill {
+  flex: auto;
+}
+
+.dialog-body {
+  overflow-y: auto;
+}
+
+.pull-left {
+  float: left;
+}
+
+.flex {
+  display: flex;
+}
+
+.options-table {
+  width: 75%;
+  margin: 1em auto;
+}
+
+.option {
+  height: 50px;
+  width: 25px;
+}
+
+.option-space {
+  height: 50px;
+  width: 10px;
+}
+
+.red {
+  background-color: #ff0000;
+}
+
+.green {
+  background-color: #00ff00;
+}
+
+.blue {
+  background-color: #0000ff;
+}
+
+.yellow {
+  background-color: #ffff00;
+}
+
+.gray {
+  background-color: #cccccc;
+}
+
+
+div.unroll-container {
+  flex: 1;
+  display: inline-block;
+}
+
+div.overlay-button-container {
+  display: grid;
+}
+
+div.overlay-canvas-container {
+  border-style: ridge;
+}
+
+div.overlay-slider-container {
+  display: flex;
+}
+
+#overlay-tools {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

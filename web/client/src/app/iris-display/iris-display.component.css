@@ -1,0 +1,171 @@
+/* 
+* NOTICE
+*  
+* This software (or technical data) was produced for the U. S. Government
+* and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV
+* (May 2014) – Alternative IV (Dec 2007)
+* 
+* (c) 2024 The MITRE Corporation. All Rights Reserved.
+*/ 
+
+@import 'https://fonts.googleapis.com/icon?family=Material+Icons';
+
+input.color-picker {
+  cursor: pointer
+}
+
+.unroll-canvas {
+  position: relative;
+}
+
+.unroll-canvas .while-loading {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+}
+
+.fill-space {
+  flex: 1 1 auto;
+}
+
+.canvas-wrapper {
+  overflow: hidden;
+}
+
+
+.toolbar {
+  float: left;
+}
+
+.toolbar-inner-left.vertical,
+.toolbar-inner-right.vertical {
+  display: inline-block;
+}
+
+.toolbar.vertical {
+  display: flex;
+}
+
+.canvas-div {
+  overflow: hidden;
+}
+
+.tool-btn {
+  display: block;
+  box-shadow: 2px 2px 2px #888;
+  margin-bottom: 3px;
+}
+
+.pallet-option-group {
+  overflow: hidden;
+}
+
+.pallet-option.tool-pallet {
+  overflow: hidden;
+}
+
+.tool-pallet {
+  height: 62px;
+}
+
+.generic-tool {
+  border-radius: 4px;
+  border: 1px solid grey;
+  display: block;
+  height: 31px;
+  box-shadow: 1px 1px 1px #888;
+  margin-bottom: 3px;
+  margin-right: 1px;
+}
+
+.color-picker {
+  background-color: lightgray;
+  width: 36px;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  opacity: 1;
+}
+
+.divider-lg {
+  border-right-width: 5px;
+}
+
+.draw-width-selector {
+  background-color: white;
+  width: 35px;
+  text-align: center;
+}
+
+.pull-original-indicator,
+.pull-unrolled-indicator {
+  display: block;
+  position: relative;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  text-align: center;
+  background-color: white;
+  border: 1px solid #ccc;
+  cursor: ns-resize;
+}
+
+#wrapper {
+  padding: 16px;
+  min-height: 100%;
+  height: 100%;
+  box-sizing: border-box; /*new*/
+}
+
+mat-sidenav {
+  width: 250px;
+}
+
+.icon-btn {
+  min-width: 32px;
+  width: 38px;
+  padding: 0px;
+}
+
+.toolbar-btn {
+  height: 38px;
+}
+
+.unrolled-label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.canvas-toolbar {
+  height: 48px;
+}
+
+.tshepii-hints {
+  font-size: 12px;
+}
+
+.group-select {
+  border: 1px solid #ededed;
+  text-align: right;
+  padding: 3px;
+}
+
+mat-drawer {
+  width: 345px;
+}
+
+.confirm-cancel-btn-group {
+  float: right;
+}
+
+.mat-button-toggle {
+  display: flex;
+  align-items: center;
+}
+
+.mat-button-toggle-checked {
+  background-color: #3F51B5;
+}

@@ -1,0 +1,37 @@
+#######################################################
+# Segmentation settings
+#######################################################
+ccnet_model_path: "./models/CCNet_epoch_260_NIRRGBmixed_adam.pth"
+mask_model_path: "./models/nestedsharedatrousresunet-217-0.027828-maskIoU-0.938739.pth"
+circle_model_path: "./models/convnext_tiny-1076-0.030622-maskIoU-0.938355.pth"
+cuda: False
+iris_hough_param1: 30
+iris_hough_param2: 5
+iris_hough_margin: 32
+pupil_hough_param1: 30
+pupil_hough_param2: 5
+pupil_hough_minimum: 12
+pupil_iris_max_ratio: 0.7
+max_pupil_iris_shift: 25
+
+#######################################################
+# Iris coding
+#######################################################
+polar_height: 64
+polar_width: 512
+recog_filter_size: 17
+recog_num_filters: 5
+recog_max_shift: 16
+recog_bsif_dir: "./models/"
+score_normalization: False
+threshold_frac_avg_bits: 0
+use_multiprocessing_jitter: True
+num_workers: 8
+#######################################################
+# Matching visualization
+#######################################################
+vis_mode: "heat_map" 
+# heat_map: 
+# single:   annotates only "strong similar regions", that is regions for which % of agreeing bits 
+#           across all filters for a given pixel is larger than "vis_min_agreed_bits"
+vis_min_agreed_bits: 50 # used only if vis_mode = single

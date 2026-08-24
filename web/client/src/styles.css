@@ -1,0 +1,520 @@
+/* 
+* NOTICE
+*  
+* This software (or technical data) was produced for the U. S. Government
+* and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV
+* (May 2014) – Alternative IV (Dec 2007)
+* 
+* (c) 2024 The MITRE Corporation. All Rights Reserved.
+*/ 
+
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+@import "material-symbols/rounded.css";
+
+html,
+body {
+  background-color: #fafafa;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border: 0;
+  display: block;
+}
+
+a {
+  cursor: pointer;
+}
+
+.dragging {
+  cursor: grabbing !important;
+}
+
+.draggable {
+  cursor: grab !important;
+}
+
+h1,
+.h1,
+h2,
+.h2,
+h3,
+.h3 {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.help-block {
+  font-size: 12px;
+}
+
+.navbar {
+  margin-bottom: 5px;
+}
+
+#requestedNameFormField .mat-mdc-form-field-required-marker {
+  color: red !important
+}
+
+.btn-sm {
+  padding: .25rem .5rem !important;
+  font-size: .875rem !important;
+  line-height: 1.5 !important;
+  border-radius: .2rem !important;
+  min-width: unset !important;
+}
+
+.btn-sm .mat-icon, .btn-sm mat-icon, .btn-sm .material-symbols-rounded {
+  font-size: 20px;
+}
+
+.btn-xs .mat-icon, .btn-xs mat-icon {
+  font-size: 13px;
+}
+
+.btn-sm .mat-icon, .btn-sm mat-icon,
+.btn-xs .mat-icon, .btn-xs mat-icon,
+.btn-sm .material-symbols-rounded,
+.btn-xs .material-symbols-rounded {
+  vertical-align: middle;
+  height: unset;
+  width: unset;
+}
+
+#content {
+  background: white;
+  -webkit-transform-origin: left top;
+  -webkit-transform: translateZ(0);
+  -moz-transform-origin: left top;
+  -moz-transform: translateZ(0);
+  -ms-transform-origin: left top;
+  -ms-transform: translateZ(0);
+  -o-transform-origin: left top;
+  -o-transform: translateZ(0);
+  transform-origin: left top;
+  transform: translateZ(0);
+}
+
+#settings {
+  border: 2px solid black;
+}
+
+#canvas_wrap {
+  overflow: auto;
+}
+
+#canvas-wrapper .mat-mdc-tab-labels {
+  border-top: 1px solid #dfdedf;
+  border-right: 1px solid #dfdedf;
+}
+
+.page-actions {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}
+
+.mat-mdc-card.card-tab-groups {
+  padding: 0;
+}
+
+.mat-mdc-card.card-tab-groups .mat-mdc-tab-group {
+  width: 100%;
+}
+
+.card-tab-groups .mat-mdc-tab-body-content {
+  padding: 20px;
+}
+
+.mat-mdc-tooltip.large-text {
+  font-size: 15px;
+}
+
+.status-menu .mat-mdc-menu-content {
+  padding: 0 !important;
+}
+
+table#service-status-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Override for button focus artifact that comes from having both bootstrap & material enabled */
+.mat-mdc-button:focus, .mat-mdc-unelevated-button:focus,
+.mat-mdc-icon-button:focus, .mat-mdc-outlined-button:focus, .mat-mdc-menu-item:focus,
+.mat-mdc-fab:focus, .mat-mdc-mini-fab:focus {
+  outline: none !important;
+}
+
+/* Override for material labels not liking the bottom margin that bootstrap labels typically get*/
+label[class^="mat-"], label[class*=" mat-"] {
+  margin-bottom: unset;
+}
+
+.center-div {
+  width: 70px;
+  float: left;
+  display: inline-block;
+  text-align: center;
+}
+
+.markup-canvas {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  border: 2px solid grey;
+}
+
+.markup-canvas .inner-markup {
+  text-align: center;
+  padding-top: 35px;
+  /*margin: 0 auto;*/
+  /*width: 60%;*/
+}
+
+.rect-canvas {
+  width: 100%;
+  height: 100px;
+  margin-top: 5px;
+}
+
+.rect-div {
+  width: 100%;
+  height: 100px;
+  border: 2px solid grey;
+}
+
+.activeCanvas {
+  border: 4px solid red;
+}
+
+.rectangle-canvas {
+  border: 2px solid grey;
+}
+
+#reviewers-list {
+  list-style-type: none;
+}
+
+#reviewers-list li {
+  text-decoration: underline;
+}
+
+.list-group-item {
+  padding: 3px 6px;
+}
+
+.color_slider_val {
+  padding: 0 5px;
+}
+
+/* TOOLS */
+.tools {
+  display: none;
+}
+
+.iris-tool {
+  padding: 3px;
+}
+
+#tool_pallet_extra {
+  padding-left: 10px;
+  width: 50%;
+  display: inline;
+  min-height: 20px;
+}
+
+.tool-item {
+  display: inline;
+}
+
+.help {
+  padding: 5px 0;
+  text-align: center;
+}
+
+.poly-list-group {
+  list-style-type: none;
+}
+
+.poly-choice-btn {
+  margin: 3px;
+  color: #000;
+  text-decoration: underline;
+}
+
+.poly-text-input {
+  color: #000;
+  display: inline;
+  width: 60%;
+}
+
+.polytool {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.pencil-list-group {
+  list-style-type: none;
+  box-shadow: none;
+}
+
+.simplecolorpicker.icon,
+.simplecolorpicker span.color {
+  margin-left: 5px;
+  font-size: 10px;
+  display: inline-block;
+  cursor: pointer;
+  border: 1px solid black;
+}
+
+.progress {
+  position: relative;
+  margin-bottom: 2px;
+}
+
+.progress-text {
+  position: absolute;
+  display: block;
+  width: 100%;
+  color: black;
+}
+
+.modal-title {
+  font-weight: bold;
+}
+
+
+.nav-text {
+  vertical-align: bottom;
+}
+
+.item-img {
+  display: inline-block;
+  width: 22%;
+  vertical-align: top;
+}
+
+.item-img img {
+  width: 20px;
+  height: 20px;
+}
+
+.item-title {
+  display: block;
+  font-weight: bold;
+}
+
+.item-body {
+  display: inline-block;
+  width: 75%;
+}
+
+.item-tools {
+  float: right;
+}
+
+.item-required {
+  margin-left: -10px;
+}
+
+.item-complete {
+  padding-left: 3px;
+  display: inline;
+}
+
+.fa-info-circle,
+.fa-eye,
+.fa-eye-slash,
+.fa-plus,
+.fa-trash,
+.fa-undo {
+  cursor: pointer;
+}
+
+.inline-tool {
+  display: inline;
+}
+
+.inline-headers h2, .inline-headers h4 {
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+input[type="range"].slider {
+  opacity: 1;
+  -webkit-appearance: slider-horizontal;
+  flex: 1;
+  height: 20px;
+  margin: 0 5px;
+}
+
+.color-picker {
+  width: 30px;
+}
+
+.color-level-tool {
+  float: left;
+  padding-left: 5px;
+}
+
+.color-level-tool .slider {
+  max-width: 300px;
+
+}
+
+.annotation-info color-picker .arrow {
+  display: none !important;
+}
+
+.annotation-list {
+  overflow: auto;
+  max-height: 80px;
+}
+
+#previewModal .modal-body {
+  height: 600px;
+  overflow: auto;
+}
+
+.thumb {
+  height: 130px;
+}
+
+.comments {
+  max-height: 500px;
+  overflow: auto;
+}
+
+.comment {
+  padding: 10px 30px;
+}
+
+#caseInfo .tab-pane {
+  padding-top: 10px;
+}
+
+.tab-content {
+  border: 1px solid #dee2e6;
+  border-top: none;
+  padding: .5rem;
+}
+
+.caseReqImage {
+  overflow: auto;
+  width: 100%;
+}
+
+/*
+TODO(mdc-migration): The following rule targets internal classes of tabs that may no longer apply for the MDC version.
+*/
+.mat-tab-body-wrapper {
+  flex-grow: 1;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.hover-color:hover {
+  background-color: #f0f0f0;
+}
+
+.toolbar-spacer {
+  flex: 1 1 auto;
+}
+
+.canvas-dropzone .dropzone, .canvas-dropzone .dz-message {
+  height: 380px !important;
+  overflow: visible !important;
+}
+
+/*  Initialization for locally hosted google material icons */
+
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://example.com/MaterialIcons-Regular.eot); /* For IE6-8 */
+  src: local('Material Icons'),
+  local('MaterialIcons-Regular'),
+  url(fonts/MaterialIcons-Regular.woff2) format('woff2'),
+  url(fonts/MaterialIcons-Regular.woff) format('woff'),
+  url(fonts/MaterialIcons-Regular.ttf) format('truetype');
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px; /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
+
+.cdk-global-overlay-wrapper, .cdk-overlay-container {
+  z-index: 9999 !important;
+}
+
+.cdk-overlay-connected-position-bounding-box {
+  z-index: 100000 !important;
+}
+
+button mat-spinner, button mat-spinner svg {
+  height: 100% !important;
+  width: 100% !important;
+}
+
+.mr-sm {
+  margin-right: 2px !important;
+}
+
+.ml-sm {
+  margin-left: 2px !important;
+}
+
+.notification-item .mat-list-item-content {
+  padding-right: 5px !important;
+}
+
+.notification-dropdown .mat-mdc-menu-content {
+  padding-bottom: 0 !important;
+}
+
+.mat-mdc-menu-panel.notification-dropdown {
+  min-width: 280px;
+}
+
+.notification-dropdown .mat-mdc-list-base {
+  padding-top: 0px;
+  padding-bottom: 8px;
+}
+
+#tab-group mat-tab-body {
+  height: 497px;
+  border-right: 1px #dfdedf solid;
+  border-bottom: 1px #dfdedf solid;
+}
+
+.mdc-tab__content {
+  font-weight: 900;
+}

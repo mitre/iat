@@ -1,0 +1,36 @@
+<!-- 
+    NOTICE
+ 
+    This software (or technical data) was produced for the U. S. Government 
+    and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+    (May 2014) – Alternative IV (Dec 2007)
+
+    (c) 2024 The MITRE Corporation. All Rights Reserved.
+-->
+
+<div class="pdm-confirmation" #pdmConfirmationDialog>
+  <div class="modal-header">
+    <h2 class="error-label" id="errorModalLabel">
+      <span class="warning-message">NOTICE: Update Service</span>
+      <i aria-hidden="true" class="fa fa-exclamation-circle warning-message"></i>
+    </h2>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      Applying the PDM deformation will <span style="color: #a94442">NOT</span> update the remaining service values. To update those values, please resubmit the image for the desired services. <br>
+      <ul>
+      <li><span class="bullet-points">Confirm & Apply</span>: Keep the currently applied PDM deformed image but does NOT update the other services.</li>
+      <li><span class="bullet-points">Go Back</span>: Continue to adjust PDM values.</li>
+      <li><span class="bullet-points">Cancel</span>: Do not apply new PDM deformation and exit the Individual Pupil Dilation Mode.</li>
+      </ul>
+
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn confirm-button" data-dismiss="modal" matTooltip="Keep the currently applied PDM deformed image but does NOT update the other services." (click)="onOptionSelected('confirm')">Confirm & Apply
+    </button>
+    <button type="button" class="btn back-button" data-dismiss="modal" matTooltip="Continue to adjust PDM values." (click)="onOptionSelected('back')">Go Back
+    </button>
+    <button type="button" class="btn cancel-button" data-dismiss="modal" matTooltip="Discard the applied PDM deformation and exit the Individual Pupil Dilation Mode." (click)="onOptionSelected('cancel')">Cancel</button>
+  </div>
+</div>

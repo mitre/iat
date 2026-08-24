@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<opencv_storage>
+<MEAN type_id="opencv-matrix">
+  <rows>1</rows>
+  <cols>2</cols>
+  <dt>d</dt>
+  <data>
+    8.7955310206578297e+000 -1.9150617063961139e-001</data></MEAN>
+<STD type_id="opencv-matrix">
+  <rows>1</rows>
+  <cols>2</cols>
+  <dt>d</dt>
+  <data>
+    8.7563810831555031e+001 5.3410901704925520e+000</data></STD>
+</opencv_storage>

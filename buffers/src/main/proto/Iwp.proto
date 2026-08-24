@@ -1,0 +1,32 @@
+/* 
+* NOTICE
+*  
+* This software (or technical data) was produced for the U. S. Government
+* and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV
+* (May 2014) – Alternative IV (Dec 2007)
+* 
+* (c) 2024 The MITRE Corporation. All Rights Reserved.
+*/ 
+
+syntax = "proto3";
+
+package org.mitre.iwp.buffers;
+
+message ImageServiceQuery {
+    string imageId = 1;
+    string path = 2;
+    bytes imageBytes = 3;
+    enum ImageType {
+      PNG = 0;
+      JPG = 1;
+      JPEG = 2;
+      JP2 = 3;
+      BMP = 4;
+      TIF = 5;
+      TIFF = 6;
+      PIXMAP = 8;
+    }
+    ImageType imageType = 4;
+    int32 width = 5;
+    int32 height = 6;
+}

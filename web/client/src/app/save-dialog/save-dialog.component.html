@@ -1,0 +1,34 @@
+<!-- 
+    NOTICE
+ 
+    This software (or technical data) was produced for the U. S. Government 
+    and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+    (May 2014) – Alternative IV (Dec 2007)
+
+    (c) 2024 The MITRE Corporation. All Rights Reserved.
+-->
+<ng-template #appSaveModal>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title" id="errorModalLabel">
+        <span class="warning-message">Unsaved Changes</span>
+        <i aria-hidden="true" class="fa fa-exclamation-circle warning-message"></i>
+      </h2>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hide()"><span
+        aria-hidden="true">&times;</span></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        Would you like to save changes before leaving page?
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="saveClicked()">Save and Continue
+      </button>
+      <button type="button" class="btn btn-danger" data-dismiss="modal" (click)="continueClicked()">Continue without
+        Saving
+      </button>
+      <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="hide()">Don't Leave Page</button>
+    </div>
+  </div>
+</ng-template>

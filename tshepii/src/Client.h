@@ -1,0 +1,119 @@
+// #######################################################################
+// NOTICE
+// 
+// This software (or technical data) was produced for the U. S. Government 
+// and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+// (May 2014) – Alternative IV (Dec 2007)
+// 
+// (c) 2024 The MITRE Corporation. All Rights Reserved.
+// #######################################################################
+
+#ifndef TSHEPII_CLIENT_INCLUDE_CLIENT_H_
+#define TSHEPII_CLIENT_INCLUDE_CLIENT_H_
+
+#include <opencv/cv.h>
+#include <opencv2/highgui.hpp>
+#include <curl/curl.h>
+
+#include <activemq/library/ActiveMQCPP.h>
+#include <activemq/transport/DefaultTransportListener.h>
+#include <activemq/util/Config.h>
+
+#include <cms/Connection.h>
+#include <cms/ExceptionListener.h>
+#include <cms/MessageListener.h>
+#include <cms/Session.h>
+#include <cms/TextMessage.h>
+
+#include <log4cxx/logger.h>
+#include <log4cxx/logmanager.h>
+#include <log4cxx/propertyconfigurator.h>
+#include <log4cxx/rolling/rollingfileappender.h>
+#include <log4cxx/simplelayout.h>
+
+#include <cstdio>
+#include <string>
+#include <vector>
+
+#include "Iwp.pb.h"
+#include "Tshepii.pb.h"
+
+using activemq::transport::DefaultTransportListener;
+using cms::BytesMessage;
+using cms::CMSException;
+using cms::Connection;
+using cms::DeliveryMode;
+using cms::Destination;
+using cms::ExceptionListener;
+using cms::Message;
+using cms::MessageConsumer;
+using cms::MessageListener;
+using cms::MessageProducer;
+using cms::Session;
+using cv::Mat;
+using org::mitre::iwp::buffers::TCircle;
+using std::string;
+using std::vector;
+using org::mitre::iwp::buffers::ImageServiceQuery;
+using org::mitre::iwp::buffers::TShepiiCompareRequest;
+using org::mitre::iwp::buffers::TShepiiCompareResponse;
+using org::mitre::iwp::buffers::TShepiiResponse;
+
+class Client : public MessageListener, public ExceptionListener, public DefaultTransportListener
+{
+
+private:
+       Session *session;
+       Connection *connection;
+       Destination *request_dest;
+       Destination *response_dest;
+       MessageConsumer *consumer;
+       MessageProducer *producer;
+       string broker_uri;
+       string artemis_user;
+       string artemis_password;
+       string requests_dest_name;
+       string response_dest_name;
+       string output_path;
+       vector<string> allowed_img_extensions;
+
+       Client &operator=(const Client &);
+       void cleanup();
+       string getImage(string id, string url,
+                       const string bytes);
+
+public:
+       ~Client();
+       Client(const string &broker_uri,
+              const string &artemis_user,
+              const string &artemis_password,
+              const string &requests_dest_name,
+              const string &response_dest_name,
+              const string &output_path,
+              const vector<string> allowed_img_extensions);
+
+       Client(const string &broker_uri,
+              const string &artemis_user,
+              const string &artemis_password,
+              const string &requests_dest_name,
+              const string &response_dest_name,
+              const vector<string> allowed_img_extensions);
+
+       void runRequestConsumer();
+       void handle_crypt_query(TShepiiResponse *response, ImageServiceQuery *query);
+       void handle_compare_query(TShepiiCompareResponse *response, TShepiiCompareRequest *query);
+       void onMessage(const Message *message);
+       void onException(const CMSException &ex);
+       void transportInterrupted();
+       void transportResumed();
+       bool imgAllowed(string &imgExt);
+       void initCircle(TCircle *circle, double x, double y, double radius);
+       static size_t write_data(void *contents, size_t size, size_t nmemb,
+                                FILE *stream);
+       static bool fileExists(const string &filename);
+
+       void loadImage(const string &rFilename, Mat **image);
+       void loadPixmap(const string &rFilename, Mat **image, int, int);
+};
+
+#endif // ACII_CLIENT_INCLUDE_CLIENT_H_

@@ -1,0 +1,22 @@
+/* 
+* NOTICE
+*  
+* This software (or technical data) was produced for the U. S. Government
+* and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV
+* (May 2014) – Alternative IV (Dec 2007)
+* 
+* (c) 2024 The MITRE Corporation. All Rights Reserved.
+*/ 
+
+syntax = "proto3";
+
+package org.mitre.iwp.buffers;
+
+message ContactClassifierResponse {
+    string imageId = 1;
+    string response = 2;
+    string message = 3;
+    string tmpPath = 4;
+    string detectionCode = 5;
+    string processTimeMS = 6;
+}

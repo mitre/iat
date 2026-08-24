@@ -1,0 +1,29 @@
+/* 
+* NOTICE
+*  
+* This software (or technical data) was produced for the U. S. Government
+* and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV
+* (May 2014) – Alternative IV (Dec 2007)
+* 
+* (c) 2024 The MITRE Corporation. All Rights Reserved.
+*/ 
+
+import { EbtsMessageRequest } from './ebts-message-request';
+
+export class CreateIrisSearchRequest {
+  id: string;
+  message: EbtsMessageRequest;
+  userId: string;
+  creationDateEpoch: number;
+  isFinished: boolean;
+  filePath: string;
+
+  constructor() {
+    this.id = '';
+    this.message = new EbtsMessageRequest();
+    this.userId = '';
+    this.filePath = '';
+    this.creationDateEpoch = 0;
+    this.isFinished = false;
+  }
+}

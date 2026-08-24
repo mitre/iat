@@ -1,0 +1,71 @@
+﻿﻿<!-- 
+    NOTICE
+ 
+    This software (or technical data) was produced for the U. S. Government 
+    and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+    (May 2014) – Alternative IV (Dec 2007)
+
+    (c) 2024 The MITRE Corporation. All Rights Reserved.
+-->
+<div class="col-md-12">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <h1 style="text-align:center">Welcome</h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12" style="padding-top: 10px;">
+        <p style="text-align: center;">This is the Iris Analysis Toolkit, an application to search and review iris
+          images.</p>
+      </div>
+    </div>
+    <div class="card-grid pt-3 pb-3">
+      <mat-card appearance="outlined" *ngIf="privs.CREATE_SEARCH">
+        <mat-card-header>
+          <div mat-card-avatar>
+            <button mat-mini-fab color="primary" routerLink="/create">
+              <i aria-hidden="true" class="fa fa-envelope-open fab-icon"></i>
+            </button>
+          </div>
+          <mat-card-title routerLink="/create" class="title-link">
+            Create EBTS
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Create an iris EBTS search file.</p>
+        </mat-card-content>
+      </mat-card>
+      <mat-card appearance="outlined" *ngIf="privs.CREATE_REVIEW">
+        <mat-card-header>
+          <div mat-card-avatar>
+            <button mat-mini-fab color="primary" routerLink="/review">
+              <i class="fa fa-cloud-download-alt fab-icon" aria-hidden="true"></i>
+            </button>
+          </div>
+          <mat-card-title routerLink="/review" class="title-link">
+            Review
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Review and analyze iris imagery from uploaded images or EBTS files.</p>
+        </mat-card-content>
+      </mat-card>
+      <mat-card appearance="outlined">
+        <mat-card-header>
+          <div mat-card-avatar>
+            <button mat-mini-fab color="primary" routerLink="/manage">
+              <i class="fa fa-address-book fab-icon" aria-hidden="true"></i>
+            </button>
+          </div>
+          <mat-card-title routerLink="/manage" class="title-link">
+            Manage
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Manage information associated with Contributors to Iris Submissions and Search requests.</p>
+        </mat-card-content>
+      </mat-card>
+    </div><!-- row -->
+  </div>
+</div>

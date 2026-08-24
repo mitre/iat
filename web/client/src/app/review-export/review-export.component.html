@@ -1,0 +1,81 @@
+<!-- 
+    NOTICE
+ 
+    This software (or technical data) was produced for the U. S. Government 
+    and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+    (May 2014) – Alternative IV (Dec 2007)
+
+    (c) 2024 The MITRE Corporation. All Rights Reserved.
+-->
+<div class="col-md-12">
+  <div class="container">
+    <div class="w-100 d-flex">
+      <h2>Review CSV Output</h2>
+    </div>
+    <div class="mt-4">
+      <mat-form-field appearance="outline">
+        <mat-label>Start Date</mat-label>
+        <input matInput [matDatepicker]="startDatePicker" id="startDate" required name="startDate"
+               [(ngModel)]="startDateVal">
+        <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #startDatePicker></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="ml-2">
+        <mat-label>End Date</mat-label>
+        <input matInput [matDatepicker]="endDatePicker" id="endDate" required name="startDate" [(ngModel)]="endDateVal">
+        <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #endDatePicker></mat-datepicker>
+      </mat-form-field>
+      <button mat-button mat-raised-button class="ml-2" (click)="applyDateFilter()"
+              [disabled]="this.startDateVal == undefined || this.endDateVal == undefined">Filter
+      </button>
+      <button id="download-csv-button" mat-button mat-raised-button id="button-align-div1" (click)="createCSV()"
+              [disabled]="this.idList.length == 0">Download CSV
+      </button>
+    </div>
+    <div class="mat-elevation-z8 mt-2">
+      <table mat-table [dataSource]="reviewRequestData" class="w-100" #reviewSort="matSort" matSort aria-describedby="Table of Current and Past Reviews at a High Overview">
+        <ng-container matColumnDef="selected">
+          <th mat-header-cell *matHeaderCellDef scope="col">
+              <mat-checkbox (change)="toggleAll($event)" [checked]="allSelected"></mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let request">
+            <mat-checkbox (change)="addToList(request.id ,$event)"
+                          [checked]="this.idList.indexOf(request.id) >= 0"></mat-checkbox>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="comparisonDate">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Comparison Date</th>
+          <td mat-cell
+              *matCellDef="let request">{{ getDateStringFromEpoch(request.caseInformation.comparisonDate / 1000) }}</td>
+        </ng-container>
+        <ng-container matColumnDef="transactionControlNumber">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Transaction Control Number</th>
+          <td mat-cell *matCellDef="let request">{{ request.probe.transactionControlNumber }}</td>
+        </ng-container>
+        <ng-container matColumnDef="responseType">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Response Type</th>
+          <td mat-cell *matCellDef="let request">{{ request.responseType }}</td>
+        </ng-container>
+        <ng-container matColumnDef="candidateCount">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col"># of Candidates</th>
+          <td mat-cell *matCellDef="let request">{{ request.candidates.length }}</td>
+        </ng-container>
+        <ng-container matColumnDef="requestedBy">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Requested By</th>
+          <td mat-cell *matCellDef="let request">{{ request.caseInformation.requestedBy.name }}</td>
+        </ng-container>
+        <ng-container matColumnDef="reviewedBy">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Conducted By</th>
+          <td mat-cell *matCellDef="let request">{{ request.workedBy.profile.name }}</td>
+        </ng-container>
+        <ng-container matColumnDef="isFinished">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Completed</th>
+          <td mat-cell *matCellDef="let request">{{ request.isFinished }}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="reviewRequestColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: reviewRequestColumns"></tr>
+      </table>
+    </div>
+  </div>
+</div>

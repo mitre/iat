@@ -1,0 +1,74 @@
+/* 
+* NOTICE
+*  
+* This software (or technical data) was produced for the U. S. Government
+* and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV
+* (May 2014) – Alternative IV (Dec 2007)
+* 
+* (c) 2024 The MITRE Corporation. All Rights Reserved.
+*/ 
+
+.expand-btn {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+}
+
+.list-group {
+  list-style-type: none;
+  overflow-y: auto;
+  box-shadow: none;
+  padding: 5px;
+}
+
+.list-group-item {
+  border: 0;
+}
+
+.list-group-item.state-wrapper {
+  padding: 5px 10px;
+}
+
+.list-group-item.state-wrapper ~ .list-group-item.state-wrapper {
+  margin-top: 5px;
+  border-top: 1px solid #ddd;
+}
+
+.list-group-item-text {
+  text-align: left;
+}
+
+.anno-wrapper {
+  padding-bottom: 0;
+  padding-left: 3px;
+  border-left: 1px dashed #bbb;
+  margin-bottom: 0;
+}
+
+.anno {
+  font-size: 13px;
+  padding: 3px 3px 3px 0;
+}
+
+.anno .anno {
+  /* Make nested annos have no bottom padding */
+  padding-bottom: 0;
+}
+
+.list-group-item.anno {
+  padding: 5px;
+}
+
+.revert-btn {
+  color: rgb(40, 167, 69);
+  float: right;
+  cursor: pointer;
+}
+
+.card-footer {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  height: 50px;
+}

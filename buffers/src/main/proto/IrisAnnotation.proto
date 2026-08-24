@@ -1,0 +1,67 @@
+/* 
+* NOTICE
+*  
+* This software (or technical data) was produced for the U. S. Government
+* and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV
+* (May 2014) – Alternative IV (Dec 2007)
+* 
+* (c) 2024 The MITRE Corporation. All Rights Reserved.
+*/ 
+
+syntax = "proto3";
+
+package org.mitre.iwp.buffers;
+
+message IrisAnnotationQuery {
+  string id = 1;
+  ModeType mode = 2;
+  string imagePath = 3;
+  bytes imageBytes = 4;
+  string imagesFile = 5;
+  OptimizationOptions optimizationOptions = 6;
+  repeated ClassOption classOptions = 7;
+}
+
+message OptimizationOptions {
+  int32 batchSize = 1;
+}
+
+message ClassOption {
+  int32 index = 1;
+  string key = 2;
+  string value = 3;
+}
+
+message IrisAnnotationReply {
+  string id = 1;
+  string response = 2;
+  string responseCode = 3;
+  string responseMessage = 4;
+  string responseTimeMS = 5;
+  repeated Annotation results = 6;
+}
+
+message Annotation {
+  string id = 1;
+  string colorHex = 2;
+  repeated Polygon polygons = 3;
+}
+
+message Polygon {
+  Points outline = 1;
+  repeated Points inline = 2;
+}
+
+message Points {
+  repeated Point points = 1;
+}
+
+message Point {
+  int32 x = 1;
+  int32 y = 2;
+}
+
+enum ModeType {
+  single = 0;
+  multiple = 1;
+}

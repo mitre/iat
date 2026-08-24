@@ -1,0 +1,45 @@
+<!-- 
+    NOTICE
+ 
+    This software (or technical data) was produced for the U. S. Government 
+    and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+    (May 2014) – Alternative IV (Dec 2007)
+
+    (c) 2024 The MITRE Corporation. All Rights Reserved.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Iris Workstation</title>
+  <base href="/">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <script type="text/javascript">
+    logoutForm = function () {
+      var newForm = document.createElement("form");
+      newForm.action = "/logout";
+      newForm.method = "POST";
+      newForm.id = "tempForm";
+      document.body.appendChild(newForm);
+      
+      const formValue = document.createElement('input');
+      formValue.type = 'hidden';
+      formValue.name = '_csrf';
+      formValue.value = document.cookie.replace(/(?:(?:^|.*;\s*)XSRF-TOKEN\s*\=\s*([^;]*).*$)|^.*$/, '$1');
+      newForm.appendChild(formValue);
+
+      newForm.submit();
+    }
+
+        // auto redirect to hash# URL
+  if (!window.location.href.match(/\/#/)) {
+    window.location.href = window.location.origin + '/#' + window.location.pathname + window.location.search;
+  }
+  </script>
+</head>
+<body>
+<app-root></app-root>
+</body>
+</html>

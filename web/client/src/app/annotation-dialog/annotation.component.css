@@ -1,0 +1,107 @@
+/* 
+* NOTICE
+*  
+* This software (or technical data) was produced for the U. S. Government
+* and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV
+* (May 2014) – Alternative IV (Dec 2007)
+* 
+* (c) 2024 The MITRE Corporation. All Rights Reserved.
+*/ 
+
+.icon-align-middle{
+  vertical-align: bottom;
+}
+
+.list-container {
+  padding: 3px 3px 44px 3px;
+}
+
+.collapse-toggle-btn {
+  padding: 0;
+}
+
+.list-group {
+  list-style-type: none;
+  overflow-y: auto;
+  box-shadow: none;
+  margin-bottom: 5px;
+}
+
+.list-group .list-group {
+  /* Add depth indicator to sublayers only */
+  border-left: 1px dashed #bbb;
+  margin-left: 15px;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.list-group-item {
+  padding: 3px 0 0 0;
+  border: 0;
+  /*border-radius: 0;*/
+}
+
+.item {
+  padding: 2px 2px 3px 0;
+}
+
+.item-icon {
+  width: 26px;
+  text-align: center;
+}
+
+.item-title {
+  display: table;
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+
+.item.item-selected,
+.item.item-selected .item {
+  background-color: rgb(217, 237, 247);
+}
+
+.item.item-defocused {
+  background-color: #eaeaea;
+}
+
+.item.item-selected .item,
+.item.item-defocused .item {
+  opacity: 0.5;
+}
+
+.item-title > * {
+  position: relative;
+  display: table-cell;
+}
+
+.item-title > input {
+  box-shadow: none;
+  border: none;
+  outline: none;
+  width: 96%;
+  padding: 3px;
+}
+
+.list-group-item-text {
+  text-align: left;
+  padding-left: 30px;
+}
+
+.list-group-item-defocus {
+  background-color: #e0e0e0;
+}
+
+footer {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  background-color: rgb(247 247 247);
+  border-radius: 0;
+  text-align: center;
+  padding: 5px;
+}

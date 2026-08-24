@@ -1,0 +1,42 @@
+<!-- 
+    NOTICE
+ 
+    This software (or technical data) was produced for the U. S. Government 
+    and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+    (May 2014) – Alternative IV (Dec 2007)
+
+    (c) 2024 The MITRE Corporation. All Rights Reserved.
+-->
+<button mat-mini-fab color="primary" [mat-menu-trigger-for]="statusDropdown">
+  <i aria-hidden="true" class="fas fa-circle status-{{serviceStatusService.overallServiceStatus}}"></i>
+</button>
+
+<mat-menu #statusDropdown xPosition="before" classList="status-menu">
+  <div class="text-muted pl-1 pr-1">
+    <table mat-table [dataSource]="serviceStatusService.serviceDataSource" class="w-100" id="service-status-table"
+           *ngIf="!serviceStatusService.serviceStatusDown; else allServicesDown" aria-describedby="Table of Services and Their Statuses">
+      <ng-container matColumnDef="service">
+        <th mat-header-cell *matHeaderCellDef scope="col">Service</th>
+        <td mat-cell *matCellDef="let service" class="name-version-info" matTooltip="{{service.serviceDefinition}}"
+            matTooltipPosition="before" matTooltipClass="large-text">
+          {{service.displayName | titlecase}}
+          <div class="text-muted version-info">v{{service.version}}</div>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef scope="col">Status</th>
+        <td mat-cell #serviceStatusColor *matCellDef="let service" matTooltip="{{service.statusHint}}"
+            matTooltipPosition="after" matTooltipClass="large-text">
+          <i aria-hidden="true" class="fas fa-circle status-{{service.status}}"></i>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="visibleColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: visibleColumns;"></tr>
+    </table>
+    <ng-template #allServicesDown>
+      <div class="text-center">
+        {{serviceStatusService.systemDownMessage}}
+      </div>
+    </ng-template>
+  </div>
+</mat-menu>

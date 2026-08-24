@@ -1,0 +1,142 @@
+<!-- 
+    NOTICE
+ 
+    This software (or technical data) was produced for the U. S. Government 
+    and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+    (May 2014) – Alternative IV (Dec 2007)
+
+    (c) 2024 The MITRE Corporation. All Rights Reserved.
+-->
+<div class="col-md-12">
+  <div class="container">
+    <div class="w-100 d-flex">
+      <h2 matTooltip="Individuals requesting the reviews reviews. They are assigned to the PDF reports during the generation of the 
+      review report. Examples could be internal or external customers/agencies asking analysts to review individuals.">Manage Requesters</h2>
+      <div class="toolbar-spacer"></div>
+      <mat-form-field>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Filter">
+      </mat-form-field>
+    </div>
+    <div class="mat-elevation-z8 mt-2">
+      <table mat-table [dataSource]="personsData" class="w-100" aria-describedby="Table of Requesters' Information">
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef scope="col">Name</th>
+          <td mat-cell *matCellDef="let person">{{person.name}}</td>
+        </ng-container>
+        <ng-container matColumnDef="title">
+          <th mat-header-cell *matHeaderCellDef scope="col">Title</th>
+          <td mat-cell *matCellDef="let person">{{person.title}}</td>
+        </ng-container>
+        <ng-container matColumnDef="department">
+          <th mat-header-cell *matHeaderCellDef scope="col">Department</th>
+          <td mat-cell *matCellDef="let person">{{person.department}}</td>
+        </ng-container>
+        <ng-container matColumnDef="address">
+          <th mat-header-cell *matHeaderCellDef scope="col">Address</th>
+          <td mat-cell *matCellDef="let person">{{person.address}}</td>
+        </ng-container>
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef scope="col">Email</th>
+          <td mat-cell *matCellDef="let person">{{person.email}}</td>
+        </ng-container>
+        <ng-container matColumnDef="phone">
+          <th mat-header-cell *matHeaderCellDef scope="col">Phone</th>
+          <td mat-cell *matCellDef="let person">{{person.phone}}</td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef scope="col">Modify</th>
+          <td mat-cell *matCellDef="let person" class="btn-xs-wrap">
+            <button mat-raised-button color="primary" class="mr-1"
+                    (click)="personEditClicked(person, addPersonModal)" matTooltip="Edit Requester">
+              <i aria-hidden="true" class="fa fa-fw fa-pencil-alt"></i>
+            </button>
+            <button mat-raised-button color="warn"
+                    (click)="removePersonClicked(person, removeConfirmModal)" matTooltip="Delete Requester">
+              <i aria-hidden="true" class="fa fa-fw fa-trash"></i>
+            </button>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="personsColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: personsColumns"></tr>
+      </table>
+      <mat-paginator [pageSizeOptions]="[10, 25, 50]"></mat-paginator>
+    </div>
+  </div>
+</div>
+
+<div class="page-actions">
+  <button mat-raised-button color="primary" (click)="newPersonClicked(addPersonModal)"><i aria-hidden="true" class="fa fa-fw fa-plus"></i>
+    Add Requester
+  </button>
+</div>
+
+<!-- Add / Edit Person Modal -->
+<ng-template #addPersonModal>
+  <h3 mat-dialog-title>{{ editing ? "Update" : "Create" }} Requester</h3>
+  <div mat-dialog-content class="person-dialog-content">
+    <form #createForm="ngForm">
+      <div class="form-group">
+        <label for="createNameInput">Full Name</label>
+        <input id="createNameInput" type="text" class="form-control" name="createNameInput" placeholder="Full Name"
+               #createNameInput="ngModel" [(ngModel)]="currentPerson.name" maxLength="40" pattern="[a-zA-Z, \-, _]{2,40}"
+               required>
+        <div [hidden]="createNameInput.valid || createNameInput.pristine" class="alert alert-danger">Entry must be 2-40 alpha characters.
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="createEmailInput">Email</label>
+        <input id="createEmailInput" type="text" class="form-control" name="createEmailInput"
+               placeholder="email@example.com" #createEmailInput="ngModel" maxLength="40"
+               pattern="[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,4}" [(ngModel)]="currentPerson.email">
+        <div [hidden]="createEmailInput.valid || createEmailInput.pristine" class="alert alert-danger">The email is invalid. Example email: email&#64;example.com
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="createPhoneInput">Phone Number</label>
+        <input id="createPhoneInput" type="text" class="form-control" name="createPhoneInput"
+               placeholder="Phone Number" #createPhoneInput="ngModel" minlength="12" maxlength="12" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" [(ngModel)]="currentPerson.phone">
+        <div [hidden]="createPhoneInput.valid || createPhoneInput.pristine" class="alert alert-danger">The entry is invalid. Use the format: xxx-xxx-xxxx
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="createTitleInput">Title</label>
+        <input id="createTitleInput" type="text" class="form-control" name="createTitleInput" placeholder="Title"
+               #createTitleInput="ngModel" maxLength="40" [(ngModel)]="currentPerson.title">
+        <div [hidden]="createTitleInput.valid || createTitleInput.pristine" class="alert alert-danger">Entry must be less than 40 characters.
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="createDepartmentInput">Department</label>
+        <input id="createDepartmentInput" type="text" class="form-control" name="createDepartmentInput"
+               placeholder="Department" #createDepartmentInput="ngModel" maxLength="40"
+               [(ngModel)]="currentPerson.department">
+        <div [hidden]="createDepartmentInput.valid || createDepartmentInput.pristine" class="alert alert-danger">Entry must be less than 40 characters.
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="createAddressInput">Address</label>
+        <input id="createAddressInput" type="text" class="form-control" name="createAddressInput" placeholder="Address"
+               #createAddressInput="ngModel" maxLength="100" [(ngModel)]="currentPerson.address">
+      <div [hidden]="createAddressInput.valid || createAddressInput.pristine" class="alert alert-danger">Entry must be less than 100 characters.
+      </div>
+      </div>
+    </form>
+  </div>
+  <div mat-dialog-actions class="confirm-cancel-btn-group">
+    <button mat-button (click)="closePerson()">Close</button>
+    <button mat-raised-button color="primary" (click)="savePerson()"
+            [disabled]="!(createForm.form.valid)">{{ editing ? "Update" : "Create" }}</button>
+  </div>
+</ng-template>
+
+<!-- Remove Person Confirmation Dialog -->
+<ng-template #removeConfirmModal>
+  <h3 mat-dialog-title>Remove Requester</h3>
+  <div mat-dialog-content>
+    Are you sure you'd like to remove this requester?
+  </div>
+  <div mat-dialog-actions class="text-right" class="confirm-cancel-btn-group">
+    <button mat-button mat-dialog-close>Cancel</button>
+    <button mat-raised-button color="warn" (click)="removePerson(currentPerson)">Remove Requester</button>
+  </div>
+</ng-template>

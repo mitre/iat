@@ -1,0 +1,51 @@
+/* 
+* NOTICE
+*  
+* This software (or technical data) was produced for the U. S. Government
+* and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV
+* (May 2014) – Alternative IV (Dec 2007)
+* 
+* (c) 2024 The MITRE Corporation. All Rights Reserved.
+*/ 
+
+syntax = "proto3";
+
+package org.mitre.iwp.buffers;
+
+message TShepiiCompareRequest {
+    TShepiiResponse response1 = 1;
+    TShepiiResponse response2 = 2;
+}
+
+message TShepiiCompareResponse {
+    TShepiiResponse cryptResponse = 1;
+    TShepiiResponse cryptResponse2 = 2;
+}
+
+message TShepiiResponse {
+    string imageId = 1;
+    repeated TPoint keypoints = 2;
+    repeated Crypt crypts = 3;
+    repeated int32 matchIndex = 4;
+    TCircle cropIris = 5;
+    TCircle cropPupil = 6;
+    TCircle originalIris = 7;
+    TCircle originalPupil = 8;
+    int32 inputImageWidth = 9;
+    int32 inputImageHeight = 10;
+}
+
+message TCircle {
+    TPoint center = 1;
+    double radius = 2;
+}
+
+message TPoint {
+    double x = 1;
+    double y = 2;
+    double size = 3;
+}
+
+message Crypt {
+    repeated TPoint points = 1;
+}

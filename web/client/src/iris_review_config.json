@@ -1,0 +1,144 @@
+{
+  "server_address": "http://localhost:8080",
+  "review": true,
+  "showColorPicker": true,
+  "maxCanvasWidth": 750,
+  "maxCanvasHeight": 550,
+  "colors": [
+    {
+      "name": "none",
+      "value": ""
+    },
+    {
+      "name": "Green",
+      "value": "#7bd148"
+    },
+    {
+      "name": "Bold green",
+      "value": "#51b749"
+    },
+    {
+      "name": "Blue",
+      "value": "#a4bdfc"
+    },
+    {
+      "name": "Bold blue",
+      "value": "#5484ed"
+    },
+    {
+      "name": "Turquoise",
+      "value": "#46d6db"
+    },
+    {
+      "name": "Yellow",
+      "value": "#fbd75b"
+    },
+    {
+      "name": "Orange",
+      "value": "#ffb878"
+    },
+    {
+      "name": "Red",
+      "value": "#ff887c"
+    },
+    {
+      "name": "Bold red",
+      "value": "#dc2127"
+    },
+    {
+      "name": "Purple",
+      "value": "#dbadff"
+    }
+  ],
+  "tools": [
+    {
+      "name": "Pencil",
+      "tool": "PencilTool",
+      "smoothing": true,
+      "description": "Freehand drawing tool",
+      "pointRadius": 4,
+      "strokeWidth": 2,
+      "fillAlpha": 0.2,
+      "type": "ANNOTATION"
+    },
+    {
+      "name": "Circle",
+      "tool": "CircleFitTool",
+      "requiredPointCount": 3,
+      "description": "The radius of the colored part of the eye. Select 3 points on the outer most ring.",
+      "type": "ANNOTATION"
+    },
+    {
+      "name": "Point",
+      "tool": "PointTool",
+      "description": "The point and shape of point.",
+      "type": "ANNOTATION"
+    },
+    {
+      "name": "Polygon",
+      "tool": "PolygonTool",
+      "description": "This allows you to mark any areas using a polygon.",
+      "pointRadius": 4,
+      "strokeWidth": 2,
+      "fillAlpha": 0.2,
+      "type": "ANNOTATION"
+    },
+    {
+      "name": "Zoom",
+      "tool": "ZoomTool",
+      "description": "This allows you to zoom in and out a step at a time.",
+      "type": "IMAGE"
+    },
+    {
+      "name": "Rotate",
+      "tool": "RotateTool",
+      "default_rotation": "10",
+      "description": "Rotates the image.",
+      "type": "IMAGE"
+    },
+    {
+      "name": "Unroll",
+      "tool": "UnrollTool",
+      "requiredPointCount": 3,
+      "description": "Select 3 points and the system will unroll to a rectangle view",
+      "type": "IMAGE"
+    },
+    {
+      "name": "Eyelid",
+      "tool": "EyelidTool",
+      "requiredPointCount": 3,
+      "description": "Mark en eyelid with points.",
+      "type": "ANNOTATION"
+    },
+    {
+      "name": "Contrast",
+      "tool": "ContrastTool",
+      "description": "Adjust the contrast of the iris image",
+      "type": "IMAGE"
+    },
+    {
+      "name": "Brightness",
+      "tool": "BrightnessTool",
+      "description": "Adjust the brightness of the iris image",
+      "type": "IMAGE"
+    },
+    {
+      "name": "Channel",
+      "tool": "ChannelTool",
+      "description": "Extraction of the red color channel from an image.",
+      "type": "IMAGE"
+    },
+    {
+      "name": "Sharpen",
+      "tool": "SharpenTool",
+      "description": "Sharpen the iris image",
+      "type": "IMAGE"
+    },
+    {
+      "name": "AdaptiveContrast",
+      "tool": "AdaptiveContrastTool",
+      "description": "Enhance definition of edges within the image",
+      "type": "IMAGE"
+    }
+  ]
+}

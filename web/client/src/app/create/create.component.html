@@ -1,0 +1,290 @@
+<!-- 
+    NOTICE
+ 
+    This software (or technical data) was produced for the U. S. Government 
+    and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+    (May 2014) – Alternative IV (Dec 2007)
+
+    (c) 2024 The MITRE Corporation. All Rights Reserved.
+-->
+<div class="row">
+  <h3 class="col-md-8">Create an EBTS </h3>
+  <div class="col-md-4">
+    <div class="btn-group text-right" dropdown>
+      <div class="btn-group">
+        <button (click)="submitIrisSearch($event)" type="submit" form="createForm" class="btn btn-primary" id="generate_btn" style="min-width: 100px"
+                [disabled]="(createForm.invalid)|| !hasImageSelected" matTooltip="To generate an EBTS, an image must be loaded in, and Case Information must be filled out." 
+                [matTooltipDisabled]="createForm.valid && hasImageSelected">
+          <ng-container *ngIf="!saveInProgress">Generate</ng-container>
+          <i aria-hidden="true" class="fa-solid fa-cog fa-spin" *ngIf="saveInProgress"></i>
+        </button>
+      </div>
+      <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+              aria-expanded="false" dropdownToggle>
+        <span class="sr-only">Toggle Dropdown</span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownLabel" *dropdownMenu>
+        <li><div matTooltip="Must load in an image to save." [matTooltipDisabled]="hasImageSelected"><button type="button" class="dropdown-item" (click)="saveSearchRequest()" [disabled]="!hasImageSelected">Save</button></div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="row" id="review-div">
+  <div class="col-xl-8">
+    <div id="probe" class="card panel-default">
+      <div class="card-body">
+        <h3 style="float: left; margin: 0">Upload Image</h3>
+        <button [style.visibility]="_hasImageSelected ? 'visible' : 'hidden'" class="btn btn-danger btn-sm text-right"
+                *ngIf="!loadedFromSave" style="margin-left: 1%;"
+                type="button" matTooltip="Discard Image" placement="bottom" (click)="changeImage()"><i
+          class="fa fa-trash"
+          aria-hidden="true"></i>
+        </button>
+        <hr/>
+        <div class="drawing-area" [ngSwitch]="hasImageSelected">
+          <ng-container *ngSwitchCase="false">
+            <div class="markup-canvas" [style.margin-top]="'10px'">
+              <dropzone class="canvas-dropzone" (success)="handleFileSuccess($event)"
+                        (error)="handleFileFailure($event)" [config]="config"></dropzone>
+            </div>
+          </ng-container>
+          <ng-container *ngSwitchCase="true">
+            <app-iris-display #probeDisplay [iris]="image"
+                          [annotations]="this.createIrisSearchRequest.message.imageData.annotations"
+                          [pastStates]="this.createIrisSearchRequest.message.imageData.pastStates"
+                          [sourceName]="'create'"
+                          [currState]="this.createIrisSearchRequest.message.imageData.currState"
+                          [currentImageData]="this.createIrisSearchRequest.message.imageData"
+                          [showOriginal]="showOriginal"
+                          [showUnrolled]="showUnrolled" [saved]="saved" (resetIris)="resetIris($event)"
+                          (displayInit)="irisDisplayInitialized($event)" [tshepiiHidden]="true">
+            </app-iris-display>
+          </ng-container>
+        </div>
+        <!--drawing-area-->
+      </div>
+    </div>
+    <div class="row">
+      <div id="help" class="col-md-12">
+        <p class="guide">
+          <span class="label label-info">Move - </span>
+          <span class="nav-text text-muted">Shift + Mouse Drag</span>
+        </p>
+        <p class="guide">
+          <span class="label label-info">Zoom - </span>
+          <span class="nav-text text-muted">Mouse Wheel</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!--    CASE INFORMATION     -->
+  <div class="col-xl-4">
+    <form #createForm="ngForm" id="createForm">
+      <div id="candidate" class="card panel-default">
+        <div class="card-body">
+          <h3 style="float: left; margin: 0">Case Information</h3>
+          <button [style.visibility]="createForm.dirty ? 'visible' : 'hidden'" class="btn btn-danger btn-sm text-right"
+                *ngIf="!loadedFromSave" style="margin-left: 2%;"
+                type="button" matTooltip="Discard Case Information" placement="bottom" (click)="changeCaseInformation()"><i
+            class="fa fa-trash"
+            aria-hidden="true"></i>
+          </button>
+          <hr/>
+          <!-- IMAGE QUALITY -->
+          <div class="mat-field-spaces">
+            <mat-form-field class="readonly-input">
+              <input matInput #imageQualityInput="ngModel" id="imageQualityInput" readonly
+                      type="text"
+                      [(ngModel)]="createService.irisImageQuality"
+                      name="imageQualityInput">
+              <mat-label>Image Quality <i aria-hidden="true" class="fa fa-question-circle" matTooltip="QVU: The predicted matching performance of the image assigned by a quality algorithm, 
+                where the higher values indicate better quality."></i></mat-label>
+              <span matTextSuffix>
+                <a style="font-size:11px" (click)="this.checkBiqtSnapshot()">
+                  Check Quality
+                </a>
+              </span>
+            </mat-form-field>
+          </div>
+          <!-- CIN PREFIX -->
+          <div class="mat-field-spaces">
+            <mat-form-field>
+              <input matInput #cinPrefix="ngModel" pattern="[a-zA-Z0-9]+" maxlength="24"
+                      type="text"
+                      id="cinPrefixInput" required
+                      [(ngModel)]="this.createIrisSearchRequest.message.cinPrefix" name="cinPrefix">
+              <mat-label>Case Prefix <i aria-hidden="true" class="fa fa-question-circle" matTooltip="CIN Prefix: A unique identifier to the latent case, which gets assigned by the 
+                contributor. Gets combined with the Case Identifier. Examples of this are 'Incident #', 'Laboratory Number', 'Invesitgation No.'"></i></mat-label>
+              <mat-error *ngIf="cinPrefix.invalid && cinPrefix.touched">Case Prefix is required and must be up to 24 alphanumeric characters.
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <!-- CIN IDENTIFIER -->
+          <div class="mat-field-spaces">
+            <mat-form-field>
+              <input matInput #cinIdentifier="ngModel" pattern="[a-zA-Z0-9]+" maxlength="24"
+                      type="text" id="cinIdentifierInput" required
+                      [(ngModel)]="this.createIrisSearchRequest.message.cinIdentifier" name="cinIdentifier">
+              <mat-label>Case Identifier <i aria-hidden="true" class="fa fa-question-circle" matTooltip="CIN Identifier: A unique identifier to the latent case, which gets assigned by 
+                the contributor. Gets combined with the Case Prefix."></i></mat-label>
+              <mat-error *ngIf="cinIdentifier.invalid">Case Identifier is required and must be up to 24 alphanumeric characters.
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <!-- CASE EXTENSION -->
+          <div class="mat-field-spaces">
+            <mat-form-field>
+              <input matInput #caseExtension="ngModel" type="number"
+                      min="0"
+                      max="9999" id="cixInput" required [(ngModel)]="this.createIrisSearchRequest.message.caseExtension"
+                      name="caseExtension">
+              <mat-label>Case Extension <i aria-hidden="true" class="fa fa-question-circle" matTooltip="CIX: The number of multiple searches to be associated with the same case."></i></mat-label>
+              <mat-hint align="end">Count of case/pair search submissions</mat-hint>
+              <mat-error *ngIf="caseExtension.invalid">Case Extension must be a number.</mat-error>
+            </mat-form-field>
+          </div>
+          <!-- NUM OF CANDIDATES-->
+          <div class="mat-field-spaces">
+            <mat-form-field>
+              <input matInput #numberOfCandidates="ngModel" type="number" id="ncrInput" required
+                      min="20" max="50" default="50"
+                      [(ngModel)]="this.createIrisSearchRequest.message.numberOfCandidates"
+                      name="numberOfCandidates">
+              <mat-label>Number of Candidates <i aria-hidden="true" class="fa fa-question-circle" matTooltip="Number of Candidates: The number of candidates for a search result."></i></mat-label>
+              <mat-error *ngIf="numberOfCandidates.invalid">The number must be between 20 and 50.
+                alphanumeric charcters
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <!-- DAI -->
+          <div class="mat-field-spaces">
+            <mat-form-field>
+              <input matInput #destinationAgencyIdentifier="ngModel" pattern="[a-zA-Z0-9]{9}"
+                      maxLength="9" id="daiInput" required type="text"
+                      [(ngModel)]="this.createIrisSearchRequest.message.destinationAgencyIdentifier"
+                      name="destinationAgencyIdentifier">
+              <mat-label>Destination Agency Identifier <i aria-hidden="true" class="fa fa-question-circle" matTooltip="DAI: The identifier of the administration or organization 
+                desginated to recieve the transmission."></i></mat-label>
+              <mat-error *ngIf="destinationAgencyIdentifier.invalid">The destination agency identifier must be 9
+                alphanumeric charcters.
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <!-- ORI-->
+          <div class="mat-field-spaces">
+            <mat-form-field>
+              <input matInput #originatingAgencyIdentifier="ngModel" pattern="[a-zA-Z0-9]{9}"
+                      maxLength="9" id="oriInput" required type="text"
+                      [(ngModel)]="this.createIrisSearchRequest.message.originatingAgencyIdentifier"
+                      name="originatingAgencyIdentifier">
+              <mat-label>Originating Agency Identifier <i aria-hidden="true" class="fa fa-question-circle" matTooltip="ORI: The identifier of the administration or organization originating the transaction."></i></mat-label>
+              <mat-error *ngIf="originatingAgencyIdentifier.invalid">The originating agency identifier must be 9
+                alphanumeric charcters.
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <!-- TCN -->
+          <div class="mat-field-spaces">
+            <mat-form-field>
+              <input matInput #transactionControlNumber="ngModel" id="tcnInput" required minlength="10" maxLength="40"
+                      pattern="[a-zA-Z0-9\-]{10,40}" type="text"
+                      [(ngModel)]="this.createIrisSearchRequest.message.transactionControlNumber"
+                      name="transactionControlNumber">
+              <mat-label>Transaction Control Number <i aria-hidden="true" class="fa fa-question-circle" matTooltip="TCN: The unique control identifer for the transaction, which gets assigned by the ORI."></i></mat-label>
+              <mat-error *ngIf="transactionControlNumber.invalid">The transaction control number must be 10-40
+                alphanumeric characters.
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <!-- Attention -->
+          <div class="mat-field-spaces">
+            <mat-form-field>
+              <input matInput #attentionIndicator="ngModel" id="atnInput" required pattern="^[^\.]+" type="text"
+                      placeholder="Attention Indicator"
+                      [(ngModel)]="this.createIrisSearchRequest.message.attentionIndicator" name="attentionIndicator">
+              <mat-label>Attention Indicator <i aria-hidden="true" class="fa fa-question-circle" matTooltip="ATN: The name of the individual to whose attention a response is to be directed."></i></mat-label>
+              <mat-error *ngIf="attentionIndicator.invalid">A transaction must have an attention indicator and it must
+                not contain a '.'.
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <!-- Eyelabel -->
+          <div class="mat-field-spaces">
+            <mat-form-field appearance="outline">
+              <mat-label>Eye Label <i aria-hidden="true" class="fa fa-question-circle" matTooltip="ELR: The orientation of the iris."></i></mat-label>
+              <mat-select id="eyeLabelInput" required name="eyeLabel" #eyeLabel="ngModel"
+                          [(ngModel)]="this.createService.eyeLabel">
+                <mat-option *ngFor="let eyeLabel of eyeLabelValues" [value]="eyeLabel">{{eyeLabelEnum[eyeLabel]}}
+                </mat-option>
+              </mat-select>
+              <mat-hint align="end">
+                <a style="font-size: 12px" (click)="createService.getAutoEyeLabel(createIrisSearchRequest.message.imageData.ebtsImageId, true)">Auto Label</a>
+              </mat-hint>
+            </mat-form-field>
+          </div>
+          <!-- Contact Type -->
+          <div class="mat-field-spaces">
+            <mat-form-field appearance="outline">
+              <mat-label>Contact Type <i aria-hidden="true" class="fa fa-question-circle" 
+                matTooltip="Contact: The type of contact that is in the subjects eye at the time the photo was taken."></i></mat-label>
+              <mat-select id="contactTypeInput" required name="contactType" #contactType="ngModel"
+                          [(ngModel)]="createService.contactType">
+                <mat-option *ngFor="let type of contactTypeValues" [value]="type">{{contactTypeEnum[type]}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <!-- Source Agency -->
+          <div class="mat-field-spaces">
+            <mat-form-field>
+              <input matInput #sourceAgency="ngModel" id="srcInput" required pattern="[a-zA-Z0-9]{9}" maxLength="9"
+                      type="text"
+                      [(ngModel)]="this.createIrisSearchRequest.message.sourceAgency" name="sourceAgency">
+              <mat-label>Source Agency <i aria-hidden="true" class="fa fa-question-circle" 
+                matTooltip="SRC: The identifier of the agency that actually created the record and supplied the information contained in it."></i></mat-label>
+              <mat-error *ngIf="sourceAgency.invalid">A source agency must be 9 alphanumeric characters.</mat-error>
+            </mat-form-field>
+          </div>
+          <!-- Iris Capture Date -->
+          <div class="mat-field-spaces">
+            <mat-form-field>
+              <input matInput class="form-control" #irisCaptureDate="ngModel" id="irisCaptureDateInput" required [max]="this.irisCaptDate" [matDatepicker]="capturePicker" name="irisCaptureDate" 
+              [ngModel]="this.irisCaptDate" (ngModelChange)="setIrisCaptureDate($event)">
+              <mat-label>Iris Capture Date <i aria-hidden="true" class="fa fa-question-circle" 
+                matTooltip="ICD: The date that the iris biometric data contained in the record was captured."></i></mat-label>
+              <mat-datepicker-toggle matIconSuffix [for]="capturePicker"></mat-datepicker-toggle>
+              <mat-datepicker #capturePicker></mat-datepicker>
+              <mat-error *ngIf="irisCaptureDate.invalid">The date must be a past or current date.</mat-error>
+            </mat-form-field>
+          </div>
+          <!-- Rotation of Eye -->
+          <div class="mat-field-spaces">
+            <mat-form-field>
+              <input matInput #rotationOfEye="ngModel" id="roeInput" type="number" max="360" min="-360"
+                      [(ngModel)]="this.createIrisSearchRequest.message.rotationOfEye"
+                      name="rotationOfEye">
+              <mat-label>Rotation of Eye <i aria-hidden="true" class="fa fa-question-circle" 
+                matTooltip="RAE: The in-plane rotation angule of the iris. Can be caused by head tilt, camera tilt, and by the common natural rotation of the eye itself. 
+            To calculate rotation angle, round(65,535*angle/360)."></i></mat-label>
+              <mat-hint align="end">*Counter-Clockwise is positive</mat-hint>
+            </mat-form-field>
+          </div>
+          <!-- Rotation of Eye Uncertainty -->
+          <div class="mat-field-spaces">
+            <mat-form-field>
+              <input matInput #rotationUncertainty="ngModel" id="rouInput" type="number" max="180"
+                      min="-180"
+                      [(ngModel)]="this.createIrisSearchRequest.message.rotationUncertainty" name="rotationUncertainty">
+              <mat-label>Rotation of Eye Uncertainty <i aria-hidden="true" class="fa fa-question-circle" 
+                matTooltip="RAU: The Uncertainty of the eye rotation given in the RAE field. To calculate the uncertainty, [round(65,535*uncertainty/180)]^280."></i></mat-label>
+            </mat-form-field>
+          </div>
+        </div>
+      <!--panel-->
+      </div>
+    </form>
+  </div>
+</div>
+<app-save-dialog #saveDialog></app-save-dialog>

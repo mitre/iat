@@ -1,0 +1,70 @@
+{
+  "server_address": "http://localhost:8080",
+  "review": false,
+  "num_of_candidates": 50,
+  "num_of_candidates_default": 50,
+  "saveImageData": true,
+  "showColorPicker": false,
+  "maxCanvasWidth": 750,
+  "maxCanvasHeight": 550,
+  "tools": [
+    {
+      "name": "Crop",
+      "tool": "CropTool",
+      "description": "This allows you to crop an area defined by a rectangle.",
+      "point_radius": 4,
+      "stroke_width": 2,
+      "fill_alpha": 0.2,
+      "type": "IMAGE"
+    },
+    {
+      "name": "Scale",
+      "tool": "ScaleTool",
+      "description": "This allows you to scale an image.",
+      "type": "IMAGE"
+    },
+    {
+      "name": "Rotate",
+      "tool": "RotateTool",
+      "default_rotation": "10",
+      "description": "Rotates the image.",
+      "type": "IMAGE"
+    },
+    {
+      "name": "Mirror",
+      "tool": "MirrorTool",
+      "description": "Flipping or mirroring of an image.",
+      "type": "IMAGE"
+    },
+    {
+      "name": "Brightness",
+      "tool": "BrightnessTool",
+      "description": "Adjust the brightness of the iris image",
+      "type": "IMAGE"
+    },
+    {
+      "name": "Contrast",
+      "tool": "ContrastTool",
+      "description": "Adjust the contrast of the iris image",
+      "type": "IMAGE"
+    },
+    {
+      "name": "Channel",
+      "tool": "ChannelTool",
+      "description": "Extraction of the red color channel from an image.",
+      "type": "IMAGE"
+    },
+    {
+      "name": "ColorLevel",
+      "tool": "ColorLevelTool",
+      "description": "Modify the color channels from an image.",
+      "type": "IMAGE"
+    },
+    {
+      "name": "Sharpen",
+      "tool": "SharpenTool",
+      "description": "Sharpen the iris image",
+      "type": "IMAGE"
+    }
+  ]
+}

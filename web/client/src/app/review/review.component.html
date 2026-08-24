@@ -1,0 +1,537 @@
+<!-- 
+    NOTICE
+ 
+    This software (or technical data) was produced for the U. S. Government 
+    and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+    (May 2014) – Alternative IV (Dec 2007)
+
+    (c) 2024 The MITRE Corporation. All Rights Reserved.
+-->
+<div>
+  <mat-toolbar class="review-toolbar">
+    <div>
+      <span class="h2">Review</span>
+    </div>
+    <div class="review-controls">
+      <div class="tshepii-button" [matTooltip]="getTshepiiButtonTooltip()">
+        <button mat-raised-button [color]="reviewService._showTshepiiComparison? 'accent' : 'primary'"
+                [disabled]="isTshepiiDisabled()"
+                class="toolbar-btn" (click)="checkMatchMap()">
+          TSHEPII Mode
+        </button>
+      </div>
+      <div class="tshepii-status text-muted">
+        <i aria-hidden="true" class="fa fa-question-circle"
+           matTooltip="Activating TSHEPII Mode adds TSHEPII annotations to the currently selected images. While active, TSHEPII Mode temporarily hides all other annotations and disables all tool controls.
+           Hovering over a TSHEPII annotation will highlight the corresponding region on the other image."></i>
+      </div>
+      <div class="dualPdm-button" [matTooltip]="getDualPDMButtonTooltip()">
+        <button mat-raised-button [color]="reviewService._showDualPDMComparison? 'accent' : 'primary'"
+                [disabled]="isDualPDMDisabled()"
+                class="toolbar-btn" (click)="triggerDualPdmMode()">
+          Dual PDM Mode
+        </button>
+      </div>
+      <div class="dualPdm-status text-muted">
+        <i aria-hidden="true" class="fa fa-question-circle"
+           matTooltip="Activating Dual PDM Mode compares the currently selected images. While active, Dual PDM Mode temporarily disables all tool controls."></i>
+      </div>
+      <div matTooltip="Unroll Comparison">
+        <button mat-mini-fab color="primary" (click)="openCompareModal()"
+                [disabled]="!isComparable()">
+          <mat-icon>compare</mat-icon>
+        </button>
+      </div>
+      <div [matTooltip]="!canShowGhostCursor ? 'Ghost Cursor: Load and select both a probe and a candidate to enable the Ghost Cursor' : 'Ghost Cursor: Mirrors the mouse pointer onto the opposing image canvas'">
+        <button mat-mini-fab color="primary" class=" ml-1" [disabled]="!canShowGhostCursor"
+                (click)="showGhostCursor()">
+          <mat-icon *ngIf="!isGhostCursorOn">link</mat-icon>
+          <mat-icon *ngIf="isGhostCursorOn">link_off</mat-icon>
+        </button>
+      </div>
+      <button matTooltip="Unload File" mat-mini-fab color="accent" *ngIf="canUnloadFile && !loadedFromSave"
+              class="ml-2"
+              (click)="unloadFileClicked()" [disabled]="!canUnloadFile">
+        <mat-icon>delete</mat-icon>
+      </button>
+      <mat-button-toggle-group value="horizontal" name="orientation" aria-label="Select Orientation" appearance="legacy"
+                               class="toolbar-btn ml-2">
+        <mat-button-toggle value="horizontal" (change)="setVertical(false)" matTooltip="Horizontal Orientation">
+          <mat-icon>view_week</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="unrolled" (change)="setVertical(true)" matTooltip="Vertical Orientation">
+          <mat-icon>view_stream</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+      <div class="btn-group" dropdown>
+        <div class="btn-group" matTooltip="Adjudicate each candidate to create a report." matTooltipPosition="above">
+          <button id="generateReportButton" style="min-width: 146px" class="btn btn-primary ml-2"
+                  [disabled]="!canSubmit || reviewService.probe.status === 'empty' || saveInProgress"
+                  (click)="openPreview(previewModal)">
+            <ng-container *ngIf="!saveInProgress">Generate Report</ng-container>
+            <i aria-hidden="true" class="fa-solid fa-cog fa-spin" *ngIf="saveInProgress"></i>
+          </button>
+        </div>
+
+        <button id="saveToggle" type="button" [disabled]="disableSave() || saveInProgress" dropdownToggle
+                class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
+          <span class="caret"></span>
+          <span class="sr-only">Toggle Dropdown</span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownLabel" *dropdownMenu>
+          <li>
+            <div matTooltip="Must load in an image to save." [matTooltipDisabled]="reviewService.probe.status !== 'empty'">
+              <button class="dropdown-item" (click)="saveReview(true)" id="saveButton"
+                      [disabled]="reviewService.probe.status === 'empty'">Save</button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </mat-toolbar>
+
+  <form #reviewForm="ngForm">
+    <div class="row">
+      <!-- Probe Selection -->
+      <div id="probe-col" [ngClass]="{'col-md-6': !isVertical, 'col-md-12': isVertical}">
+        <div class="card panel-default">
+          <div class="card-body">
+            <span class="h3" *ngIf="reviewService.currentProbeImageIndex === -1; else probeInfo">Probe</span>
+            <ng-template #probeInfo>
+              <div style="min-height: 48px">
+                <div class="d-inline-block w-100" [class.unload-button-visible]="canUnloadProbe">
+                  <mat-accordion>
+                    <mat-expansion-panel class="probe-info">
+                      <mat-expansion-panel-header>
+                        <mat-panel-title>
+                          Probe Information
+                        </mat-panel-title>
+                      </mat-expansion-panel-header>
+                      <div class="form-group">
+                        <label for="tcnInput">Transaction Control Number <i aria-hidden="true" class="fa fa-question-circle" matTooltip="TCN: The unique control identifer for the transaction, which gets assigned by the ORI."></i></label>
+                        <input id="tcnInput" type="text" class="form-control" disabled="disabled"
+                               [(ngModel)]="reviewService.currentReport.probe.transactionControlNumber" name="probeTCN">
+                      </div>
+                      <div class="form-group">
+                        <label for="tcrInput">Transaction Control Reference <i aria-hidden="true" class="fa fa-question-circle" matTooltip="TCR: The identifier for responses that refers to the TCN of
+                           a previous transaction involving an inquiry or other action that required a response."></i></label>
+                        <input id="tcrInput" type="text" class="form-control" disabled="disabled"
+                               [(ngModel)]="reviewService.currentReport.probe.transactionControlReference" name="probeTCR">
+                      </div>
+                      <div class="form-group">
+                        <label for="subjectIdentifierInput">Subject Identifier <i aria-hidden="true" class="fa fa-question-circle" matTooltip="ESI: The identifier from an external system that represents a distinct identity."></i></label>
+                        <input id="subjectIdentifierInput" type="text" class="form-control" disabled="disabled"
+                               [(ngModel)]="reviewService.currentReport.probe.subjectIdentifier" name="probeSubjectIdentifier">
+                      </div>
+                    </mat-expansion-panel>
+                  </mat-accordion>
+                </div>
+                <div *ngIf="canUnloadProbe" class="float-right">
+                  <button mat-fab extended color="accent" class="ml-1 d-inline-block" style="height: 48px"
+                          *ngIf="!loadedFromSave"
+                          type="button" matTooltip=" Discard Probe" placement="bottom" (click)="changeProbeImage()">
+                    <mat-icon class="mr-0 ml-0">delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <mat-tab-group (selectedIndexChange)="selectProbeImage($event)"  mat-stretch-tabs="false" [(selectedIndex)]="probeSelectedTab">
+                <mat-tab *ngFor="let imageData of reviewService.currentReport.probe.imageList; index as idx">
+                  <ng-template mat-tab-label>
+                    <span>Record Type: {{imageData.recordType}}<br />Image No.{{imageData.recordIndex}}</span>
+                    <i aria-hidden="true" class="fa fa-question-circle"
+                       [matTooltip]="'Record Type is a ' + imageData.recordType + ' and the Image selected is ' + imageData.recordIndex"></i>
+                  </ng-template>
+                  <div class="p-1">
+                    <mat-accordion *ngIf="reviewService.currentProbeImageIndex !== -1">
+                      <mat-expansion-panel class="probe-image-info">
+                        <mat-expansion-panel-header>
+                          <mat-panel-title>
+                            Image Information
+                          </mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <div class="form-group">
+                          <label for="currentProbeImageLabel">Image Quality <i aria-hidden="true" class="fa fa-question-circle" matTooltip="QVU: The predicted matching performance of the image assigned by a quality algorithm, 
+                            where the higher values indicate better quality."></i></label>
+                          <input matInput #currentProbeImageLabel="ngModel" id="imageQualityInput" readonly
+                                 placeholder="Image Quality" type="number"
+                                 class="form-control"
+                                 [(ngModel)]="reviewService.currentReport.probe.imageList[reviewService.currentProbeImageIndex].qualityScore"
+                                 name="probeQualityInput">
+                        </div>
+                        <div class="form-group">
+                          <label for="currentProbeImageLabel">Eye Label <i aria-hidden="true" class="fa fa-question-circle" matTooltip="ELR: The orientation of the iris."></i></label>
+                          <i aria-hidden="true" id="currentProbeImageLabel" class="fa fa-exclamation-circle text-warning"
+                             [style.visibility]="checkEyeLabel(reviewService.currentReport.probe.imageList[reviewService.currentProbeImageIndex].eyeLabel, reviewService.probe.analysisPosition) ? 'hidden' : 'visible'"></i>
+                          <select class="form-control custom-select"
+                                  [(ngModel)]="reviewService.currentReport.probe.imageList[reviewService.currentProbeImageIndex].eyeLabel"
+                                  name="probePosition">
+                            <option *ngFor="let label of eyeLabelOptions" [value]="label">{{eyeLabel[label]}}
+                            </option>
+                          </select>
+                          <div style="padding-top: 10px;"
+                               [hidden]="checkEyeLabel(reviewService.currentReport.probe.imageList[reviewService.currentProbeImageIndex].eyeLabel, reviewService.probe.analysisPosition)"
+                               class="alert alert-warning">Analysis believes this is
+                            {{eyeLabel[reviewService.probe.analysisPosition]}}
+                            Eye
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label for="currentProbeImageContactType">Contact Type <i aria-hidden="true" class="fa fa-question-circle" 
+                            matTooltip="Contact: The type of contact that is in the subjects eye at the time the photo was taken."></i></label>
+                          <select id="currentProbeImageContactType" class="form-control custom-select"
+                                  [(ngModel)]="reviewService.currentReport.probe.imageList[reviewService.currentProbeImageIndex].contactType"
+                                  name="probeContactType">
+                            <option *ngFor="let type of contactTypeOptions" [value]="type">{{contactType[type]}}
+                            </option>
+                          </select>
+                        </div>
+                        <div class="form-group">
+                          <label for="imageTextAreaProbe">Notes</label>
+                          <textarea id="imageTextAreaProbe" class="form-control" rows="4" cols="80"
+                                    [(ngModel)]="reviewService.currentReport.probe.imageList[reviewService.currentProbeImageIndex].imageNotes"
+                                    name="probeNotes"></textarea>
+                        </div>
+                      </mat-expansion-panel>
+                    </mat-accordion>
+                  </div>
+                </mat-tab>
+              </mat-tab-group>
+            </ng-template>
+            <div class="drawing-area px-1" [ngSwitch]="reviewService.probe.status" [hidden]="isProbeIrisDataMissing">
+              <ng-container *ngSwitchCase="'empty'">
+                <div class="markup-canvas mt-1">
+                  <dropzone class="canvas-dropzone" [config]="probeConfig" (success)="onProbeLoadSuccess($event)"
+                            (error)="onLoadingError($event)"></dropzone>
+                </div>
+              </ng-container>
+              <ng-container *ngSwitchCase="'resetting'">
+                <p>Resetting...</p>
+              </ng-container>
+              <ng-container *ngSwitchCase="'loaded'">
+                <app-candidate-container [showOriginal]="probeShowOrigSubject" [showUnrolled]="probeShowUnrolledSubject"
+                                     [uuid]="reviewService.probe.activeUuid" [displayDrawColor]="'#127bdc'"
+                                     [displayFillColor]="'#333333'"
+                                     [annotations]="reviewService.currentReport.probe.imageList[reviewService.currentProbeImageIndex].annotations"
+                                     [iris]="reviewService.probe.image"
+                                     [unrollImagePath]="reviewService.probe.unrollImagePath" [unrollRingData]="reviewService.probe.unrollRingData"
+                                     [isVertical]="isVerticalSubject" [saved]="probeSaved" [sourceName]="'probe'"
+                                     [pastStates]="reviewService.currentReport.probe.imageList[reviewService.currentProbeImageIndex].pastStates"
+                                     [currState]="reviewService.currentReport.probe.imageList[reviewService.currentProbeImageIndex].currState"
+                                     [isReview]="true"
+                                     [loadedProbeImage]="reviewService.probe"
+                                     [loadedCandidateImage]="reviewService.candidate"
+                                     [currentImageData]="reviewService.currentReport.probe.imageList[reviewService.currentProbeImageIndex]"
+                                     (irismousemove)='probeIrisDisplayMouseMove($event)' (resetEmitter)="resetAnnos()"
+                                     (cacheEmitter)="updateProbeStatus()" (updateUnroll)="updateProbeUnroll($event)">
+                </app-candidate-container>
+              </ng-container>
+            </div>
+            <div [hidden]="!isProbeIrisDataMissing" class="mt-1 alert alert-danger">Probe Image Has Data Missing!
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Candidate Selection -->
+      <div id="candidate-col" [ngClass]="{'col-md-6': !isVertical, 'col-md-12': isVertical}">
+        <div class="card panel-default" style="position: static;">
+          <div class="card-body" [ngSwitch]="candidateStatus">
+            <span class="h3" *ngIf="candidateStatus === reviewStatus.FILE_LOAD; else candidateInfo">Candidates</span>
+            <ng-template #candidateInfo>
+              <div style="min-height: 48px">
+                <div class="d-inline-block w-100" [class.unload-button-visible]="canUnloadCandidate">
+                  <mat-accordion
+                    *ngIf="reviewService.currentReport && reviewService.currentReport.candidates && reviewService.currentReport.candidates.length != 0">
+                    <mat-expansion-panel #candidatesPanel [(expanded)]="isCandidatePanelExpanded">
+                      <mat-expansion-panel-header>
+                        <mat-panel-title>
+                          Select Candidate
+                        </mat-panel-title>
+                      </mat-expansion-panel-header>
+                      <div class="modal-body">
+                        <p class="text-center text-muted">Click on a candidate to view in the Candidate Pane</p>
+                        <div class="table-responsive">
+                          <table class="table table-hover table-bordered" aria-describedby="Table of Optional Candidates">
+                            <thead>
+                            <tr class="text-center">
+                              <th scope="col" matTooltip="the position within the candidate list ">Rank</th>
+                              <th scope="col" matTooltip="File: The thumbnail icon of each image">File</th>
+                              <th scope="col" matTooltip="ESI: The identifier from an external system that represents a distinct identity.">Subject Id</th>
+                              <th scope="col" matTooltip="Status: The human adjudicated value on whether the candidate is a Match, No Match, or Inconclusive">Status</th>
+                              <th scope="col">Note</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr *ngFor="let candidate of reviewService.currentReport.candidates; let idx = index"
+                                 class="pointer">
+                              <td (click)="selectCandidate(candidate)"><span title="score: {{ candidate.score }}">{{ idx + 1}}</span></td>
+                              <td (click)="selectCandidate(candidate)">
+                                <div
+                                  [hidden]="!isCandidateIrisDataMissing && candidate.imageList[reviewService.currentCandidateImageIndex].ebtsImageId != '-1'">
+                                  <i aria-hidden="true" style="color:#a94442" class="fa fa-exclamation-circle fa-lg"></i>
+                                </div>
+                                <div
+                                  [hidden]="isCandidateIrisDataMissing || candidate.imageList[reviewService.currentCandidateImageIndex].ebtsImageId == '-1'">
+                                  <img
+                                    [src]="(config.imageURL + candidate.imageList[reviewService.currentCandidateImageIndex].ebtsImageId)"
+                                    [alt]="(config.imageURL + candidate.imageList[reviewService.currentCandidateImageIndex].ebtsImageId)"
+                                    width="50" height="50">
+                                </div>
+                              </td>
+                              <td (click)="selectCandidate(candidate)">{{candidate.subjectIdentifier}}</td>
+                              <td>
+                                <select class="custom-select" [(ngModel)]="candidate.adjudicationResults"
+                                        (change)="candidateAdjudicated($event)"
+                                        name="candidateAdjudicationResults-{{idx}}">
+                                  <option></option>
+                                  <option *ngFor="let option of adjudicationOptions"
+                                          [ngValue]="option">{{option}}</option>
+                                </select>
+                              </td>
+                              <td class="text-center">
+                                  <textarea rows="4" cols="25" [(ngModel)]="candidate.note"
+                                            name="candidateNotes-{{idx}}"></textarea>
+                              </td>
+                            </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <!--table-responsive-->
+                      </div>
+                    </mat-expansion-panel>
+                  </mat-accordion>
+                </div>
+                <div *ngIf="canUnloadCandidate" class="float-right">
+                  <button mat-fab extended color="accent" class="ml-1 d-inline-block" style="height: 48px"
+                          *ngIf="!loadedFromSave"
+                          type="button" matTooltip="Discard Candidate" placement="bottom" (click)="changeCandidateImage()">
+                    <mat-icon class="ml-0 mr-0">delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <mat-tab-group *ngIf="reviewService.currentCandidate != undefined" mat-stretch-tabs="false"
+                             (selectedIndexChange)="selectCandidateImage($event)" [(selectedIndex)]="candidateSelectedTab">
+                <mat-tab *ngFor="let imageData of reviewService.currentCandidate.imageList; index as idx">
+                  <ng-template mat-tab-label>
+                    <span>Record Type: {{imageData.recordType}}<br />Image No.{{imageData.recordIndex}}</span>
+                    <i aria-hidden="true" class="fa fa-question-circle"
+                       [matTooltip]="'Record Type is a ' + imageData.recordType + ' and the Image selected is ' + imageData.recordIndex"></i>
+                    <span *ngIf="reviewService.probe.ebtsImageId === imageData.ebtsImageId"
+                          matTooltip="This Image is identical to the Probe." matTooltipPosition="right">
+                      <i aria-hidden="true" class="fa fa-fw fa-exclamation-circle text-danger ml-1"></i>
+                    </span>
+                  </ng-template>
+                  <div class="p-1">
+                    <mat-accordion>
+                      <mat-expansion-panel>
+                        <mat-expansion-panel-header>
+                          <mat-panel-title>
+                            Image Information
+                          </mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <div class="form-group">
+                          <label for="currentCandidateImageLabel">Image Quality <i aria-hidden="true" class="fa fa-question-circle" matTooltip="QVU: The predicted matching performance of the image assigned by a quality algorithm, 
+                            where the higher values indicate better quality."></i></label>
+                          <input matInput #probeQualityInput="ngModel" id="currentCandidateImageLabel" readonly
+                                 placeholder="Image Quality" type="number"
+                                 class="form-control"
+                                 [(ngModel)]="reviewService.currentCandidate.imageList[reviewService.currentCandidateImageIndex].qualityScore"
+                                 name="currentCandidateImageLabel">
+                        </div>
+                        <div class="form-group">
+                          <label for="currentProbeImageLabel">Eye Label <i aria-hidden="true" class="fa fa-question-circle" matTooltip="ELR: The orientation of the iris."></i></label>
+                          <i aria-hidden="true" class="fa fa-exclamation-circle text-warning"
+                             [style.visibility]="checkEyeLabel(reviewService.currentCandidate.imageList[reviewService.currentCandidateImageIndex].eyeLabel, reviewService.candidate.analysisPosition) ? 'hidden' : 'visible'"></i>
+                          <select class="form-control custom-select"
+                                  [(ngModel)]="reviewService.currentCandidate.imageList[reviewService.currentCandidateImageIndex].eyeLabel"
+                                  name="candidateEyeLabel">
+                            <option *ngFor="let label of eyeLabelOptions" [value]="label">{{eyeLabel[label]}}
+                            </option>
+                          </select>
+                          <div style="padding-top: 10px;"
+                               [hidden]="checkEyeLabel(reviewService.currentCandidate.imageList[reviewService.currentCandidateImageIndex].eyeLabel, reviewService.candidate.analysisPosition)"
+                               class="alert alert-warning">Analysis believes this is
+                            {{eyeLabel[reviewService.candidate.analysisPosition]}} Eye
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label for="currentCandidateImageContactType">Contact Type <i aria-hidden="true" class="fa fa-question-circle" 
+                            matTooltip="Contact: The type of contact that is in the subjects eye at the time the photo was taken."></i></label>
+                          <select id="currentCandidateImageContactType" class="form-control custom-select"
+                                  [(ngModel)]="reviewService.currentCandidate.imageList[reviewService.currentCandidateImageIndex].contactType"
+                                  name="candidateContactType">
+                            <option *ngFor="let type of contactTypeOptions" [value]="type">{{contactType[type]}}
+                            </option>
+                          </select>
+                        </div>
+                        <div class="form-group">
+                          <label for="imageTextAreaCandidate">Notes</label>
+                          <textarea id="imageTextAreaCandidate" class="form-control" rows="4" cols="80"
+                                    [(ngModel)]="reviewService.currentCandidate.imageList[reviewService.currentCandidateImageIndex].imageNotes"
+                                    name="candidateNotes"></textarea>
+                        </div>
+                      </mat-expansion-panel>
+                    </mat-accordion>
+                  </div>
+                </mat-tab>
+              </mat-tab-group>
+            </ng-template>
+            <div class="drawing-area px-1" [hidden]="isCandidateIrisDataMissing">
+              <ng-container *ngSwitchCase="reviewStatus.FILE_LOAD">
+                <div class="markup-canvas mt-1">
+                  <dropzone class="canvas-dropzone" [config]="config" (success)="onCandidateLoadSuccess($event)"
+                            (error)="onLoadingError($event)"></dropzone>
+                </div>
+              </ng-container>
+              <ng-container *ngSwitchCase="reviewStatus.FULL_RESPONSE">
+                <div class="markup-canvas">
+                  <div class="inner-markup">
+                    <p>Please select a candidate above.</p>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-container *ngSwitchCase="reviewStatus.RESETTING">
+                <p>Resetting...</p>
+              </ng-container>
+              <ng-container *ngSwitchCase="reviewStatus.ACTIVE_CANDIDATE">
+                <app-candidate-container [showOriginal]="candShowOrigSubject" [showUnrolled]="candShowUnrolledSubject"
+                                     [uuid]="reviewService.candidate.activeUuid" [displayDrawColor]="'#d00'"
+                                     [displayFillColor]="'#fff'"
+                                     [iris]="reviewService.candidate.image" [unrollImagePath]="reviewService.candidate.unrollImagePath"
+                                     [unrollRingData]="reviewService.candidate.unrollRingData" [sourceName]="'candidate'"
+                                     [annotations]="reviewService.currentCandidate.imageList[reviewService.currentCandidateImageIndex].annotations"
+                                     [isVertical]="isVerticalSubject" [saved]="candidateSaved" [isReview]="true"
+                                     [currentImageData]="reviewService.currentCandidate.imageList[reviewService.currentCandidateImageIndex]"
+                                     [loadedCandidateImage]="reviewService.candidate"
+                                     [loadedProbeImage]="reviewService.probe"
+                                     (irismousemove)='candidateIrisDisplayMouseMove($event)'
+                                     (resetEmitter)="resetAnnos()"
+                                     (cacheEmitter)="updateCandidateStatus()"
+                                     (updateUnroll)="updateCandidateUnroll($event)">
+                </app-candidate-container>
+                <div class="text-center mt-1 alert alert-danger"
+                     *ngIf="!!reviewService.probe && reviewService.probe.ebtsImageId === reviewService.candidate.ebtsImageId">This Image is Identical to the
+                  Probe!
+                </div>
+              </ng-container>
+            </div>
+            <div [hidden]="!isCandidateIrisDataMissing" class="mt-1 alert alert-danger">Candidate Image Has Data
+              Missing!
+            </div>
+          </div>
+          <!--panel-default-->
+        </div>
+        <!--col-md-6-->
+      </div>
+    </div>
+    <!--row-->
+    <div class="row">
+      <div id="help" class="col-md-12">
+        <p class="guide">
+          <span class="label label-info">Move - </span>
+          <span class="nav-text text-muted">Shift + Mouse Drag</span>
+        </p>
+        <p class="guide">
+          <span class="label label-info">Zoom - </span>
+          <span class="nav-text text-muted">Mouse Wheel</span>
+        </p>
+      </div>
+    </div>
+    <!-- Modals Here -->
+
+    <!--error modal -->
+    <ng-template #errorModal>
+      <div id="errorModal">
+        <div class="modal-header">
+          <h2 class="modal-title" id="errorModalLabel">
+            <i aria-hidden="true" style="color:#a94442" class="fa fa-exclamation-circle"></i>
+            <span style="color:#a94442">Error</span>
+          </h2>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="errorModalClose()"> <span
+            aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="tcnInputModal">Transaction Control Number</label>
+            <input id="tcnInputModal" type="text" class="form-control" disabled="disabled"
+                   [(ngModel)]="reviewService.currentReport.probe.transactionControlNumber" name="candidateTCN">
+          </div>
+          <div class="form-group">
+            <label for="tcrInputModal">Transaction Control Reference</label>
+            <input id="tcrInputModal" type="text" class="form-control" disabled="disabled"
+                   [(ngModel)]="reviewService.currentReport.probe.transactionControlReference" name="candidateTCR">
+          </div>
+          <div class="form-group">
+            <label for="errorList">Errors</label>
+            <ul id="errorList" class="list-group">
+              <li class="list-group-item" *ngFor="let message of reviewService.currentReport.errorMessages">{{message}}</li>
+            </ul>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                  (click)="errorModalClose()">Close
+          </button>
+        </div>
+      </div>
+    </ng-template>
+    <!-- Modal -->
+    <div class="modal fade" id="rect_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="myModalLabel">Comparison</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          </div>
+          <div class="modal-body">
+            Probe
+            <div class="rect-div">
+            </div>
+            Compare
+            <div class="rect-div">
+            </div>
+            Candidate
+            <div class="rect-div">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Report Preview Modal -->
+    <ng-template #previewModal>
+      <div id="previewModal">
+        <div class="modal-header">
+          <h5 class="modal-title" id="previewModalLabel">Report Preview</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="previewModalRef.hide()">
+            <span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body">
+          <app-report-details #reportDetails [caseInformation]="reviewService.currentReport.caseInformation"></app-report-details>
+        </div>
+        <div class="modal-footer">
+          <mat-checkbox [(ngModel)]="isSystemGeneratedAnnotationsIncluded"
+                        name="isAnnotatedIncluded">Include System's
+            Annotations
+          </mat-checkbox>
+          <div class="right-footer">
+            <button mat-flat-button class="cancel-button" data-dismiss="modal"
+                    (click)="previewModalRef.hide()">Cancel
+            </button>
+            <button mat-flat-button color="primary"
+                    [disabled]="(reportDetails.reportForm.invalid) || (reportDetails.isNameRequired) || saveInProgress"
+                    (click)="submitButtonClick($event)" data-dismiss="modal">Send
+              <mat-spinner *ngIf="saveInProgress"></mat-spinner>
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+    <app-save-dialog #saveDialog></app-save-dialog>
+  </form>
+</div>

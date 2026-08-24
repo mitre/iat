@@ -1,0 +1,43 @@
+/* 
+* NOTICE
+*  
+* This software (or technical data) was produced for the U. S. Government
+* and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV
+* (May 2014) – Alternative IV (Dec 2007)
+* 
+* (c) 2024 The MITRE Corporation. All Rights Reserved.
+*/ 
+
+syntax = "proto3";
+
+package org.mitre.iwp.buffers;
+
+// Request and Response for Dual PDM Image Comparison
+message DualPDMComparison {
+    bytes probe = 1;
+    bytes candidate = 2;
+}
+
+// Response Wrapper for Single Image PDM
+message DeformerWrapper {
+    string imageId = 1;
+    map<string, DeformedImage> eyePreserveResponse = 2;
+}
+ 
+message DeformedImage {
+    bytes imageData = 1;
+    float score = 2;
+    enum ImageType {
+        PNG = 0;
+        JPG = 1;
+        JPEG = 2;
+        JP2 = 3;
+        BMP = 4;
+        TIF = 5;
+        TIFF = 6;
+        PIXMAP = 7;
+    }
+    ImageType imageType = 3;
+    int32 width = 4;
+    int32 height = 5;
+}

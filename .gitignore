@@ -1,3 +1,51 @@
-*/target
+#
+# NOTICE
+# 
+# This software (or technical data) was produced for the U. S. Government 
+# and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+# (May 2014) – Alternative IV (Dec 2007)
+# 
+# (c) 2024 The MITRE Corporation. All Rights Reserved.
+# 
+
+# IAT Items
 .DS_Store
-.env
+docker/.env
+*/target/*
+jet/
+
+# Web Directories
+web/client/.angular/
+web/client/dist/
+web/client/node_modules/
+
+# Acii Directories
+acii/acii-client/logs/
+acii/acii-client/build/
+
+# Inference Directories
+inference/logs/
+inference/__pycache__/
+inference/*.out
+inference/*.png
+inference/*.sh
+
+# BIQT Directories
+biqt/build/
+biqt/.idea/
+biqt/*.iml
+biqt/target/
+
+# Tshepii Directories
+tshepii/build/
+tshepii/.idea
+
+# PDM Directories
+pdm/__pycache__/
+pdm/models/
+pdm/modules/__pycache__/
+pdm/data/
+pdm/.DS_Store
+pdm/.env
+pdm/*venv*
+pdm/pdm-models*

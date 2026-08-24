@@ -1,0 +1,47 @@
+<!-- 
+    NOTICE
+ 
+    This software (or technical data) was produced for the U. S. Government 
+    and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+    (May 2014) – Alternative IV (Dec 2007)
+
+    (c) 2024 The MITRE Corporation. All Rights Reserved.
+-->
+<button mat-mini-fab color="primary" [mat-menu-trigger-for]="notificationDropdown"
+        [matBadge]="newNotificationCount" matBadgeColor="accent" matBadgePosition="below after"
+        [matBadgeHidden]="newNotificationCount === 0"
+        (click)="resetButtonToggle()">
+  <mat-icon>notifications</mat-icon>
+</button>
+<mat-menu #notificationDropdown xPosition="before" class="notification-dropdown">
+  <div class="text-center text-muted p-2" *ngIf="notifications.length === 0">
+    No new notifications, congratulations!
+  </div>
+
+
+  <mat-list #notificationList>
+    <mat-list-item *ngFor="let notification of notifications" class="notification-item pointer hover-color"
+                   [class.text-muted]="!notification.isNew">
+      <mat-icon mat-list-icon
+                (click)="clickNotification(notification)">{{notification.icon}}</mat-icon>
+      <div mat-line
+           (click)="clickNotification(notification)">{{notification.message}}</div>
+      <button mat-button class="float-right"
+              (click)="deleteNotification(notification)">
+        <mat-icon>clear</mat-icon>
+      </button>
+    </mat-list-item>
+  </mat-list>
+
+  <div class="menu-footer text-center">
+    <button mat-raised-button class="btn-xs" color="warn"
+            (click)="deleteAllNotifications()"
+            matTooltip="Delete All" [disabled]="notifications.length == 0">
+      <mat-icon>delete_sweep</mat-icon>
+      Delete All
+    </button>
+    <button mat-raised-button class="btn-xs ml-1" color="primary"
+            (click)="clearNotifications()" matTooltip="Mark All Read" [disabled]="notifications.length == 0">Mark All Read
+    </button>
+  </div>
+</mat-menu>

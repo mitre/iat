@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<!-- 
+    NOTICE
+ 
+    This software (or technical data) was produced for the U. S. Government 
+    and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV 
+    (May 2014) – Alternative IV (Dec 2007)
+
+    (c) 2024 The MITRE Corporation. All Rights Reserved.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="mismatchRequest.iwp.mitre.org"
+  xmlns="mismatchRequest.iwp.mitre.org">
+
+  <xs:element name="request">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="id" type="xs:integer" />
+        <xs:element name="probe" type="ProbeType" />
+        <xs:element name="targets" type="TargetsType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="ProbeType">
+    <xs:sequence>
+      <xs:element name="ucn" type="xs:string" />
+      <xs:element name="encounter" type="EncounterType" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TargetsType">
+    <xs:sequence>
+      <xs:element name="target" type="IdentityType" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="IdentityType">
+    <xs:sequence>
+      <xs:element name="ucn" type="xs:string" />
+      <xs:element name="encounters" type="EncountersType" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="EncountersType">
+    <xs:sequence>
+      <xs:element name="encounter" type="EncounterType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="EncounterType">
+    <xs:sequence>
+      <xs:element name="ecn" type="xs:string" />
+      <xs:element name="encounterId" type="xs:string" />
+      <xs:element name="match" type="xs:boolean" />
+      <xs:element name="images" type="ImageType" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="StatusType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ENROLLED" />
+      <xs:enumeration value="NOT_ENROLLED" />
+      <xs:enumeration value="FAILED_TO_ENROLL" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DmeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="UC" />
+      <xs:enumeration value="MA" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ElrType">
+    <xs:restriction base="xs:integer">
+      <xs:enumeration value="0" />
+      <xs:enumeration value="1" />
+      <xs:enumeration value="2" />
+    </xs:restriction>
+  </xs:simpleType> 
+
+  <xs:complexType name="ImageType">
+    <xs:simpleContent>
+      <xs:extension base="xs:base64Binary">
+        <xs:attribute name="elr" type="ElrType" use="required"/>
+        <xs:attribute name="dme" type="DmeType" />
+        <xs:attribute name="status" type="StatusType" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+</xs:schema>
