@@ -26,7 +26,7 @@ services:
       EXTRA_ARGS: --http-host 0.0.0.0
 
   web:
-    image: ghcr.io/mitre/iat/iwp-web:26.08
+    image: ghcr.io/mitre/iat/iwp-web:latest
     restart: always
     depends_on:
       mysql:
@@ -49,7 +49,7 @@ services:
     platform: linux/amd64
 
   iwp-acii:
-    image: ghcr.io/mitre/iat/iwp-acii:26.08
+    image: ghcr.io/mitre/iat/iwp-acii:latest
     container_name: acii
     restart: always
     depends_on:
@@ -63,7 +63,7 @@ services:
     command: ["sh", "/etc/iwp-acii/start-acii.sh"]
 
   iwp-biqt:
-    image: ghcr.io/mitre/iat/iwp-biqt:26.08
+    image: ghcr.io/mitre/iat/iwp-biqt:latest
     container_name: biqt
     restart: always
     depends_on:
@@ -77,7 +77,7 @@ services:
 
   # Iris Annotation via CPU 
   iwp-annotation:
-    image: ghcr.io/mitre/iat/iwp-annotation-cpu:26.08
+    image: ghcr.io/mitre/iat/iwp-annotation-cpu:latest
     container_name: annotation
     restart: always
     depends_on:
@@ -91,7 +91,7 @@ services:
 
   # Iris Annotation via GPU 
   # iwp-annotation:
-  #   image: ghcr.io/mitre/iat/iwp-annotation-gpu:26.08
+  #   image: ghcr.io/mitre/iat/iwp-annotation-gpu:latest
   #   container_name: annotation
   #   restart: always
   #   depends_on:
@@ -111,7 +111,7 @@ services:
   #             capabilities: [gpu]
 
   iwp-tshepii:
-    image: ghcr.io/mitre/iat/iwp-tshepii:26.08
+    image: ghcr.io/mitre/iat/iwp-tshepii:latest
     container_name: tshepii
     restart: always
     depends_on:
@@ -127,7 +127,7 @@ services:
     platform: linux/amd64
 
   iwp-pdm:
-    image: ghcr.io/mitre/iat/iwp-pdm:26.08
+    image: ghcr.io/mitre/iat/iwp-pdm:latest
     container_name: pdm
     restart: always
     depends_on:
