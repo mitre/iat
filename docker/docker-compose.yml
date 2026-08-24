@@ -77,7 +77,7 @@ services:
 
   # Iris Annotation via CPU 
   iwp-annotation:
-    image: ghcr.io/mitre/iat/iwp-annotation-cpu:latest
+    image: ghcr.io/mitre/iat/iwp-annotation:latest
     container_name: annotation
     restart: always
     depends_on:
@@ -91,7 +91,7 @@ services:
 
   # Iris Annotation via GPU 
   # iwp-annotation:
-  #   image: ghcr.io/mitre/iat/iwp-annotation-gpu:latest
+  #   image: ghcr.io/mitre/iat/iwp-annotation:latest
   #   container_name: annotation
   #   restart: always
   #   depends_on:

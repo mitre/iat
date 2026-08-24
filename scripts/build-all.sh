@@ -19,7 +19,7 @@ CA_FILE=${IAT_CA_FILE:-}
 WEB_IMAGE=${IAT_WEB_IMAGE:-ghcr.io/mitre/iat/iwp-web:26.08}
 ACII_IMAGE=${IAT_ACII_IMAGE:-ghcr.io/mitre/iat/iwp-acii:26.08}
 BIQT_IMAGE=${IAT_BIQT_IMAGE:-ghcr.io/mitre/iat/iwp-biqt:26.08}
-ANNOTATION_IMAGE=${IAT_ANNOTATION_IMAGE:-ghcr.io/mitre/iat/iwp-annotation-cpu:26.08}
+ANNOTATION_IMAGE=${IAT_ANNOTATION_IMAGE:-ghcr.io/mitre/iat/iwp-annotation:26.08}
 TSHEPII_IMAGE=${IAT_TSHEPII_IMAGE:-ghcr.io/mitre/iat/iwp-tshepii:26.08}
 PDM_IMAGE=${IAT_PDM_IMAGE:-ghcr.io/mitre/iat/iwp-pdm:26.08}
 

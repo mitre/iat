@@ -62,7 +62,7 @@ The script clones the public dependencies into a sibling `iat-dependencies/` dir
 The script builds the CPU Iris Annotation image. To build the GPU variant instead, run the equivalent command after the script completes:
 
 ```sh
-docker build -t ghcr.io/mitre/iat/iwp-annotation-gpu:26.08 \
+docker build -t ghcr.io/mitre/iat/iwp-annotation:26.08 \
   -f inference/core/Dockerfile-GPU inference/core
 ```
 
